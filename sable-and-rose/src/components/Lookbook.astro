@@ -1,0 +1,27 @@
+---
+import { Picture } from 'astro:assets';
+import { lookbook, site } from '../data/site';
+---
+<section id="lookbook" class="section-pad">
+  <div class="work-heading">
+    <h2 class="poster-title">Recent work</h2>
+    <a href={site.social.instagram}>Follow {site.instagram} ↗</a>
+  </div>
+  <div class="work-arrows">
+    <button data-direction="-1" aria-label="Previous photograph" aria-controls="work-strip">←</button>
+    <button data-direction="1" aria-label="Next photograph" aria-controls="work-strip">→</button>
+  </div>
+  <div id="work-strip" tabindex="0" aria-label="Recent hair looks" role="region">
+    {lookbook.map((l,i) => <figure>
+      <Picture src={l.image} alt={l.alt} widths={[400,700,1000]} sizes="(min-width:768px) 30vw, 80vw" formats={['avif','webp']} />
+      <figcaption>{String(i+1).padStart(2,'0')} — {l.label}</figcaption>
+    </figure>)}
+  </div>
+</section>
+<script>
+  const row = document.getElementById('work-strip')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-direction]').forEach(button => button.addEventListener('click', () => {
+    const [first, second] = row.querySelectorAll('figure');
+    row.scrollBy({ left: (second.offsetLeft - first.offsetLeft) * Number(button.dataset.direction) });
+  }));
+</script>

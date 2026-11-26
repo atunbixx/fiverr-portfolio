@@ -1,0 +1,27 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { studio } from '../data/site';
+---
+<section class="bg-sand/60 border-y border-border">
+  <div class="grid lg:grid-cols-2">
+    <div class="relative min-h-[320px] lg:min-h-[620px]">
+      <Picture src={studio.image} alt={studio.alt} widths={[640, 1000, 1500]} sizes="(min-width: 1024px) 50vw, 100vw" formats={['avif', 'webp']} class="absolute inset-0 w-full h-full object-cover" />
+    </div>
+    <div class="px-5 sm:px-8 lg:px-16 py-16 lg:py-24 flex flex-col justify-center reveal">
+      <p class="eyebrow mb-4">The Studio</p>
+      <h2 class="h2 mb-6">A calm room, <em class="italic text-rose-deep">unhurried</em> appointments.</h2>
+      <p class="text-muted-foreground leading-relaxed mb-10 max-w-[52ch]">
+        We book fewer clients so every appointment has room to breathe — a proper consultation, a scalp massage at the basin, and time to get the finish just right.
+      </p>
+      <ul class="flex flex-col gap-6">
+        {studio.points.map((p) => (
+          <li class="flex gap-4">
+            <span class="w-11 h-11 rounded-full bg-rose-soft text-rose-deep grid place-items-center shrink-0"><Icon name={p.icon} size={18} /></span>
+            <span><span class="block font-semibold mb-0.5">{p.title}</span><span class="block text-sm text-muted-foreground leading-relaxed">{p.text}</span></span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>

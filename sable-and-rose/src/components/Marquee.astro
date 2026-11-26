@@ -1,0 +1,17 @@
+---
+import { site, hours } from '../data/site';
+---
+<div class="info-strip">
+  <div><strong>{site.rating}★</strong><span>{site.reviewCount} Google reviews</span></div>
+  <div><strong>Est. {site.founded}</strong><span>East Austin</span></div>
+  <div><strong>{site.address.street}</strong></div>
+  <div><i aria-hidden="true"></i><strong data-status data-hours={JSON.stringify(hours)}>Studio hours</strong></div>
+</div>
+<script>
+  const el = document.querySelector<HTMLElement>('[data-status]')!;
+  const today = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'short' }).format(new Date());
+  const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(today);
+  const schedule = JSON.parse(el.dataset.hours!)[day];
+  el.textContent = schedule ? `Open today till ${Number(schedule.close.slice(0,2)) - 12}pm` : 'Closed today';
+  document.querySelector(`[data-weekdays~="${day}"]`)?.setAttribute('aria-current', 'date');
+</script>

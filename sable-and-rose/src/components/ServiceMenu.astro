@@ -1,0 +1,21 @@
+---
+import { menu, site } from '../data/site';
+const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)} hr${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`);
+---
+<section id="services" class="section-pad">
+  <h2 class="poster-title">The menu <sup>01</sup></h2>
+  <div class="price-board">
+    {menu.map(c => <section>
+      <h3>{c.label}</h3>
+      {c.services.map(s => <article>
+        <div class="price-line"><h4>{s.name}</h4><i aria-hidden="true"></i><strong>{s.from && 'from '}{site.currency}{s.price}</strong></div>
+        <div class="price-meta"><span>{fmtDur(s.duration)}</span><a href="#book" data-book-service={s.id} aria-label={`Book ${s.name}`}>Book →</a></div>
+      </article>)}
+    </section>)}
+  </div>
+</section>
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('[data-book-service]').forEach((a) =>
+    a.addEventListener('click', () => document.dispatchEvent(new CustomEvent('book:preset', { detail: { service: a.dataset.bookService } }))),
+  );
+</script>

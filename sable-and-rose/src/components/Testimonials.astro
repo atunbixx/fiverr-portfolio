@@ -1,0 +1,8 @@
+---
+import { testimonials } from '../data/site';
+---
+<section class="reviews section-pad" aria-label="Client reviews">
+  {testimonials.map(t => <figure>
+    <span aria-hidden="true">“</span><blockquote>{t.quote}</blockquote><figcaption>{t.name}, {t.service}</figcaption>
+  </figure>)}
+</section>

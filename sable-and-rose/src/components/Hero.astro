@@ -1,0 +1,38 @@
+---
+import { Picture } from 'astro:assets';
+import { hero, hours } from '../data/site';
+---
+<section id="top" class="hero">
+  <div class="hero-copy">
+    <h1><span>Sharp cuts.</span><span>Loud colour.</span><span>No fuss.</span></h1>
+    <p>Precision cuts, colour and textured hair in East Austin.</p>
+    <div class="flex flex-wrap gap-3">
+      <a class="btn-red" href="#book">Book a chair</a>
+      <a class="btn-ghost" href="#services">See the menu</a>
+    </div>
+  </div>
+  <div class="hero-photo">
+    <Picture src={hero.image} alt={hero.imageAlt} widths={[480,780,1024]} sizes="(min-width: 768px) 42vw, 100vw" formats={['avif','webp']} loading="eager" fetchpriority="high" />
+    <p id="next-available" class="hidden" data-hours={JSON.stringify(hours)}>Next chair: <strong data-slot></strong></p>
+  </div>
+</section>
+<script>
+  // Show the next bookable slot (based on opening hours) — makes the page feel alive.
+  const el = document.getElementById('next-available')!;
+  const hours = JSON.parse(el.dataset.hours!) as Record<string, { open: string; close: string } | null>;
+  const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const now = new Date();
+  for (let i = 0; i < 8; i++) {
+    const d = new Date(now); d.setDate(now.getDate() + i);
+    const h = hours[d.getDay()];
+    if (!h) continue;
+    let start = toMin(h.open);
+    if (i === 0) start = Math.max(start, Math.ceil((now.getHours() * 60 + now.getMinutes() + 90) / 30) * 30);
+    if (start + 60 > toMin(h.close)) continue;
+    const t = new Date(d); t.setHours(Math.floor(start / 60), start % 60, 0, 0);
+    const day = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : t.toLocaleDateString('en-US', { weekday: 'long' });
+    el.querySelector('[data-slot]')!.textContent = `${day} ${t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    el.classList.remove('hidden'); el.classList.add('flex');
+    break;
+  }
+</script>

@@ -1,0 +1,31 @@
+---
+import Icon from './Icon.astro';
+import Wordmark from './Wordmark.astro';
+import { nav } from '../data/site';
+---
+<header class="masthead">
+  <nav aria-label="Main">
+    <Wordmark />
+    <ul class="desktop-nav">{nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+    <div class="flex items-center gap-2">
+      <a href="#book" class="btn-red">Book<span class="hidden sm:inline">&nbsp;now</span></a>
+      <button id="nav-toggle" class="md:hidden p-2" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+        <span class="icon-open"><Icon name="menu" /></span><span class="icon-close hidden"><Icon name="x" /></span>
+      </button>
+    </div>
+  </nav>
+  <div id="mobile-nav" class="hidden md:hidden"><ul>{nav.map(l => <li><a href={l.href}>{l.label}</a></li>)}</ul></div>
+</header>
+<script>
+  const btn = document.getElementById('nav-toggle')!;
+  const panel = document.getElementById('mobile-nav')!;
+  const set = (open: boolean) => {
+    panel.classList.toggle('hidden', !open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    btn.querySelector('.icon-open')!.classList.toggle('hidden', open);
+    btn.querySelector('.icon-close')!.classList.toggle('hidden', !open);
+  };
+  btn.addEventListener('click', () => set(panel.classList.contains('hidden')));
+  panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => set(false)));
+</script>

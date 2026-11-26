@@ -1,0 +1,24 @@
+---
+import { site, nav } from '../data/site';
+---
+<footer class="section-pad">
+  <div class="newsletter"><h2>Notes from the chair</h2>
+    <div><form id="newsletter" novalidate>
+      <label class="sr-only" for="nl-email">Email address</label>
+      <input id="nl-email" type="email" required placeholder="Your email address" autocomplete="email" />
+      <button class="btn-ink">Subscribe</button>
+    </form><p id="nl-msg" aria-live="polite"></p></div>
+  </div>
+  <div class="footer-links"><ul>{nav.map(l => <li><a href={l.href}>{l.label}</a></li>)}<li><a href="#book">Book</a></li><li><a href={site.social.instagram}>Instagram</a></li></ul><span>© {new Date().getFullYear()} GLOSS</span></div>
+  <div class="footer-mark" aria-hidden="true">GLOSS</div>
+</footer>
+<script>
+  const f = document.getElementById('newsletter') as HTMLFormElement;
+  const msg = document.getElementById('nl-msg')!;
+  f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = f.querySelector('input')!;
+    if (!input.checkValidity()) { msg.textContent = 'Please enter a valid email address.'; input.focus(); return; }
+    msg.textContent = "You're on the list — talk soon."; f.reset();
+  });
+</script>

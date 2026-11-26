@@ -1,0 +1,13 @@
+---
+import { site, hoursDisplay } from '../data/site';
+const addr = `${site.address.street}, ${site.address.locality}, ${site.address.region} ${site.address.postcode}`;
+const weekdays = ['1','2 3','4','5','6','0'];
+---
+<section class="visit section-pad dark" id="visit" aria-label="Visit GLOSS">
+  <div>
+    <h2>{site.address.street},<br />{site.address.locality} {site.address.region}</h2>
+    <address><a href="tel:+15125550147">{site.phone}</a><a href={`mailto:${site.email}`}>{site.email}</a></address>
+    <a class="btn-ghost" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`}>Get directions ↗</a>
+  </div>
+  <div><h3>Opening hours</h3><dl>{hoursDisplay.map((h,i) => <div data-weekdays={weekdays[i]}><dt>{h.day}</dt><dd>{h.time}</dd></div>)}</dl></div>
+</section>

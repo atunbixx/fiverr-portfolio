@@ -1,0 +1,20 @@
+---
+import { Picture } from 'astro:assets';
+import { stylists } from '../data/site';
+---
+<section id="stylists" class="section-pad dark">
+  <h2 class="poster-title">The team</h2>
+  <div class="team-grid">
+    {stylists.map(s => <article>
+      <Picture src={s.image} alt={s.alt} widths={[400,700,1000]} sizes="(min-width:768px) 30vw, 90vw" formats={['avif','webp']} />
+      <h3>{s.name}</h3><p>{s.role}</p>
+      <ul>{s.specialties.map(t => <li>{t}</li>)}</ul>
+      <a href="#book" data-book-stylist={s.id}>Book with {s.name.split(' ')[0]} →</a>
+    </article>)}
+  </div>
+</section>
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('[data-book-stylist]').forEach((a) =>
+    a.addEventListener('click', () => document.dispatchEvent(new CustomEvent('book:preset', { detail: { stylist: a.dataset.bookStylist } }))),
+  );
+</script>
