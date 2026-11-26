@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import NavBar from '../components/NavBar.astro';
+import HeroSection from '../components/HeroSection.astro';
+import StorySection from '../components/StorySection.astro';
+import MenuSection from '../components/MenuSection.astro';
+import OpeningHours from '../components/OpeningHours.astro';
+import ReservationForm from '../components/ReservationForm.astro';
+import MapSection from '../components/MapSection.astro';
+import GalleryStrip from '../components/GalleryStrip.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+---
+<Base>
+  <NavBar />
+  <main id="main">
+    <HeroSection />
+    <StorySection />
+    <MenuSection />
+    <section class="bg-secondary px-5 sm:px-8 lg:px-16 py-16 lg:py-20" aria-label="Hours, booking and location">
+      <div class="grid gap-8 lg:grid-cols-[1fr_1.4fr_1fr] items-start">
+        <div class="order-2 lg:order-1 reveal"><OpeningHours /></div>
+        <div class="order-1 lg:order-2 reveal"><ReservationForm /></div>
+        <div class="order-3 reveal"><MapSection /></div>
+      </div>
+    </section>
+    <GalleryStrip />
+  </main>
+  <SiteFooter />
+</Base>

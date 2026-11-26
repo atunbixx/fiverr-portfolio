@@ -1,0 +1,35 @@
+---
+import SocialIcon from './SocialIcon.astro';
+import { site, footerLinks, photoCredits } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="w-full bg-dark text-dark-foreground px-5 sm:px-8 lg:px-16 py-14">
+  <div class="flex flex-col md:flex-row justify-between items-start gap-10 mb-12">
+    <div class="flex flex-col gap-3 max-w-[320px]">
+      <span class="font-headings text-xl text-dark-foreground">{site.name}</span>
+      <p class="font-body text-sm text-dark-muted leading-relaxed">
+        A warm corner of Paris in the heart of the city. French classics, seasonal ingredients, and a table that always feels like home.
+      </p>
+    </div>
+    <div class="flex gap-12 sm:gap-16">
+      <nav class="flex flex-col gap-3" aria-label="Footer">
+        <p class="eyebrow">Navigate</p>
+        {footerLinks.map((l) => <a href={l.href} class="font-body text-sm text-dark-muted hover:text-dark-foreground transition-colors">{l.label}</a>)}
+      </nav>
+      <div class="flex flex-col gap-3">
+        <p class="eyebrow">Contact</p>
+        <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="font-body text-sm text-dark-muted hover:text-dark-foreground">{site.phone}</a>
+        <a href={`mailto:${site.email}`} class="font-body text-sm text-dark-muted hover:text-dark-foreground">{site.email}</a>
+        <div class="flex gap-3 mt-2">
+          <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Instagram" class="border border-dark-line rounded-sm p-2 text-dark-muted hover:text-accent hover:border-accent transition-colors"><SocialIcon name="instagram" /></a>
+          <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Facebook" class="border border-dark-line rounded-sm p-2 text-dark-muted hover:text-accent hover:border-accent transition-colors"><SocialIcon name="facebook" /></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="border-t border-dark-line pt-6 flex flex-col sm:flex-row gap-2 justify-between sm:items-center">
+    <p class="font-body text-xs text-dark-muted">© {year} {site.name}. All rights reserved.</p>
+    <p class="font-body text-xs text-dark-muted">{site.address.city}, {site.address.country}</p>
+  </div>
+  <p class="font-body text-[10px] text-dark-muted/60 mt-4">{photoCredits.join(' ')}</p>
+</footer>

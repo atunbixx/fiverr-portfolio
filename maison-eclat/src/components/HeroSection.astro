@@ -1,0 +1,19 @@
+---
+import { Picture } from 'astro:assets';
+import { hero } from '../data/site';
+---
+<section id="top" class="relative w-full h-[78svh] min-h-[520px] max-h-[760px] lg:h-[680px] overflow-hidden bg-dark">
+  <Picture src={hero.image} alt={hero.alt} widths={[640, 1024, 1600, 2000]} sizes="100vw" formats={['avif', 'webp']}
+    loading="eager" fetchpriority="high" class="absolute inset-0 w-full h-full object-cover object-[50%_22%]" />
+  <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-dark/95 via-dark/65 to-dark/25 md:from-dark/90 md:via-dark/55 md:to-dark/20"></div>
+  <div class="relative z-10 h-full flex flex-col justify-end px-5 sm:px-8 lg:px-20 pb-12 lg:pb-16">
+    <p class="font-body text-xs sm:text-sm tracking-[0.18em] text-accent mb-4 uppercase [text-shadow:0_1px_12px_rgba(30,21,16,.9)]">{hero.eyebrow}</p>
+    <h1 class="font-headings text-[40px] leading-[1.08] sm:text-4xl lg:text-5xl font-normal text-dark-foreground mb-7 max-w-[640px] text-balance">
+      {hero.title}
+    </h1>
+    <div class="flex flex-wrap gap-x-6 gap-y-4 items-center">
+      <a href="#reservations" class="btn-primary px-8 py-3.5">Reserve Your Table</a>
+      <a href="#menu" class="font-body text-sm text-dark-foreground border-b border-dark-foreground pb-0.5 hover:text-accent hover:border-accent transition-colors">View Menu</a>
+    </div>
+  </div>
+</section>

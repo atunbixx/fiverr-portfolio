@@ -1,0 +1,17 @@
+---
+import { Picture } from 'astro:assets';
+import { ArrowRight } from '@lucide/astro';
+import { story } from '../data/site';
+---
+<section id="about" class="grid md:grid-cols-2 bg-background md:min-h-[340px]">
+  <div class="relative overflow-hidden aspect-[4/3] md:aspect-auto">
+    <Picture src={story.image} alt={story.alt} widths={[480, 800, 1200]} sizes="(min-width: 768px) 50vw, 100vw" formats={['avif', 'webp']}
+      class="absolute inset-0 w-full h-full object-cover object-[50%_60%]" />
+  </div>
+  <div class="bg-secondary flex flex-col justify-center px-5 sm:px-8 lg:px-16 py-14 gap-5 reveal">
+    <p class="eyebrow">{story.eyebrow}</p>
+    <h2 class="font-headings text-[30px] lg:text-3xl text-foreground leading-tight text-balance">{story.title}</h2>
+    <p class="font-body text-base text-muted-foreground leading-relaxed max-w-[52ch]">{story.body}</p>
+    <a href="#contact" class="link-underline">Read our story <ArrowRight size={14} /></a>
+  </div>
+</section>

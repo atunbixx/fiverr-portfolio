@@ -1,0 +1,12 @@
+---
+import { Picture } from 'astro:assets';
+import { gallery } from '../data/site';
+---
+<section aria-label="Gallery" class="grid grid-cols-2 md:grid-cols-4">
+  {gallery.map((g) => (
+    <div class="overflow-hidden aspect-square md:aspect-auto md:h-[280px]">
+      <Picture src={g.image} alt={g.alt} widths={[360, 600, 900]} sizes="(min-width: 768px) 25vw, 50vw" formats={['avif', 'webp']}
+        class="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-[1.05]" />
+    </div>
+  ))}
+</section>

@@ -1,0 +1,18 @@
+---
+import MenuCard from './MenuCard.astro';
+import { menu } from '../data/site';
+---
+<section id="menu" class="px-5 sm:px-8 lg:px-16 py-16 lg:py-20 bg-background">
+  <div class="flex flex-wrap justify-between items-end gap-4 mb-10 reveal">
+    <div>
+      <p class="eyebrow mb-2">À La Carte</p>
+      <h2 class="font-headings text-[30px] lg:text-3xl text-foreground">From Our Kitchen</h2>
+    </div>
+    <a href="#contact" class="link-underline">View Full Menu</a>
+  </div>
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {menu.map((item, i) => (
+      <div class="reveal" style={`transition-delay:${i * 90}ms`}><MenuCard {...item} /></div>
+    ))}
+  </div>
+</section>

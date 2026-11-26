@@ -1,0 +1,68 @@
+@import "@fontsource/pt-serif/400.css";
+@import "@fontsource/pt-serif/700.css";
+@import "@fontsource/pt-serif/400-italic.css";
+@import "@fontsource-variable/dm-sans";
+@import "tailwindcss";
+
+/* Design tokens — taken 1:1 from the Banani "Editorial Bistro" theme */
+@theme {
+  --color-background: #f9f4ef;
+  --color-foreground: #1e1510;
+  --color-border: #ddd3c5;
+  --color-input: #f0e9e0;
+  --color-primary: #9b4c1e;
+  --color-primary-hover: #84401a;
+  --color-primary-foreground: #f9f4ef;
+  --color-secondary: #e8ddd0;
+  --color-secondary-foreground: #5c3d26;
+  --color-muted: #e0d5c5;
+  --color-muted-foreground: #8a7260;
+  --color-accent: #c97c3a;
+  --color-accent-foreground: #f9f4ef;
+  --color-dark: #1e1510;
+  --color-dark-foreground: #f9f4ef;
+  --color-dark-muted: #a8927f;
+  --color-dark-line: #4a3a2e;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 16px;
+
+  --font-body: "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-headings: "PT Serif", Georgia, "Times New Roman", serif;
+
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 38px;
+  --text-4xl: 56px;
+  --text-5xl: 72px;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-background text-foreground font-body antialiased; }
+  ::selection { background: var(--color-accent); color: var(--color-accent-foreground); }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  .eyebrow { @apply font-body text-xs font-bold tracking-[0.18em] uppercase text-accent; }
+  .link-underline { @apply font-body text-sm font-bold text-primary inline-flex items-center gap-2 border-b border-primary pb-0.5 w-fit transition-colors hover:text-primary-hover hover:border-primary-hover; }
+  .btn-primary { @apply inline-flex items-center justify-center font-body text-sm font-bold bg-primary text-primary-foreground rounded-sm transition-colors hover:bg-primary-hover; }
+  .field { @apply w-full border border-dark-line rounded-sm px-4 py-3 font-body text-sm text-dark-foreground bg-transparent placeholder:text-dark-muted transition-colors focus:border-accent focus:outline-none; }
+  .field option { @apply bg-dark text-dark-foreground; }
+}
+
+/* Gentle fade-up as sections enter the viewport */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }

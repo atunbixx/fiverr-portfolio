@@ -1,0 +1,150 @@
+---
+import { Calendar, ChevronDown, Clock, Check } from '@lucide/astro';
+import { openingSpec } from '../data/site';
+// Set PUBLIC_FORM_ENDPOINT (e.g. a Web3Forms / Formspree URL) to receive real bookings.
+// Without it the form runs in demo mode and just shows the confirmation state.
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
+---
+<div id="reservations" class="bg-dark rounded-sm p-6 sm:p-10 flex flex-col gap-6 scroll-mt-24">
+  <div class="flex flex-col gap-1">
+    <p class="eyebrow">Online Booking</p>
+    <h2 class="font-headings text-2xl text-dark-foreground">Reserve a Table</h2>
+  </div>
+
+  <form id="booking-form" class="flex flex-col gap-4" novalidate data-endpoint={endpoint} data-hours={JSON.stringify(openingSpec)}>
+    {accessKey && <input type="hidden" name="access_key" value={accessKey} />}
+    <input type="hidden" name="subject" value="New table reservation" />
+    <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label class="flex flex-col gap-1.5">
+        <span class="sr-only">Your name</span>
+        <input class="field" name="name" type="text" placeholder="Your name" autocomplete="name" required />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="sr-only">Email address</span>
+        <input class="field" name="email" type="email" placeholder="Email address" autocomplete="email" required />
+      </label>
+    </div>
+
+    <div class="grid gap-4 grid-cols-2">
+      <label class="relative col-span-2 sm:col-span-1">
+        <span class="sr-only">Date</span>
+        <input id="bk-date" class="field pr-10 [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full" name="date" type="date" required />
+        <Calendar size={14} class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-dark-muted" />
+      </label>
+      <label class="relative col-span-2 sm:col-span-1">
+        <span class="sr-only">Time</span>
+        <select id="bk-time" class="field appearance-none pr-10 disabled:cursor-not-allowed" name="time" required disabled>
+          <option value="">Time — choose a date</option>
+        </select>
+        <Clock size={14} class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-dark-muted" />
+      </label>
+      <label class="relative">
+        <span class="sr-only">Number of guests</span>
+        <select class="field appearance-none pr-10" name="guests" required>
+          <option value="">Guests</option>
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
+          <option value="9+">9+ (we'll call you)</option>
+        </select>
+        <ChevronDown size={14} class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-dark-muted" />
+      </label>
+      <label>
+        <span class="sr-only">Phone (optional)</span>
+        <input class="field" name="phone" type="tel" placeholder="Phone (optional)" autocomplete="tel" />
+      </label>
+    </div>
+
+    <label>
+      <span class="sr-only">Special requests</span>
+      <textarea class="field resize-none" name="message" rows="2" placeholder="Special requests (optional)"></textarea>
+    </label>
+
+    <p id="bk-error" class="hidden font-body text-xs text-accent" role="alert"></p>
+
+    <button type="submit" class="btn-primary w-full px-8 py-3.5 mt-1 disabled:opacity-60">
+      <span class="label">Confirm Reservation</span>
+    </button>
+    <p class="font-body text-xs text-dark-muted text-center">We will confirm your booking within 2 hours.</p>
+  </form>
+
+  <div id="booking-done" class="hidden flex-col items-center text-center gap-4 py-8" aria-live="polite">
+    <span class="grid place-items-center w-12 h-12 rounded-full bg-primary text-primary-foreground"><Check size={22} /></span>
+    <h3 class="font-headings text-xl text-dark-foreground">Merci — request received</h3>
+    <p id="booking-summary" class="font-body text-sm text-dark-muted max-w-[34ch]"></p>
+    <button id="booking-again" type="button" class="font-body text-xs text-accent border-b border-accent pb-0.5">Make another booking</button>
+  </div>
+</div>
+
+<script>
+  type Slot = { days: string[]; opens: string; closes: string };
+  const form = document.getElementById('booking-form') as HTMLFormElement;
+  const dateEl = document.getElementById('bk-date') as HTMLInputElement;
+  const timeEl = document.getElementById('bk-time') as HTMLSelectElement;
+  const errEl = document.getElementById('bk-error')!;
+  const done = document.getElementById('booking-done')!;
+  const hours: Slot[] = JSON.parse(form.dataset.hours || '[]');
+  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const fmt = (m: number) => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+
+  const today = new Date();
+  dateEl.min = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
+  dateEl.addEventListener('change', () => {
+    timeEl.innerHTML = '';
+    if (!dateEl.value) { timeEl.disabled = true; timeEl.add(new Option('Time — choose a date', '')); return; }
+    const day = DAYS[new Date(dateEl.value + 'T12:00').getDay()];
+    const slots = hours.filter((s) => s.days.includes(day));
+    if (!slots.length) { timeEl.disabled = true; timeEl.add(new Option(`Closed on ${day}s`, '')); return; }
+    timeEl.disabled = false;
+    timeEl.add(new Option('Select a time', ''));
+    for (const s of slots) {
+      // last seating 30 min before the kitchen closes (kitchen closes 30 min before closing)
+      for (let m = toMin(s.opens); m <= toMin(s.closes) - 60; m += 30) timeEl.add(new Option(fmt(m), fmt(m)));
+    }
+  });
+
+  const showError = (msg: string) => { errEl.textContent = msg; errEl.classList.remove('hidden'); };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errEl.classList.add('hidden');
+    if (!form.checkValidity()) {
+      const bad = form.querySelector(':invalid') as HTMLInputElement | null;
+      bad?.focus();
+      showError(bad?.name === 'email' ? 'Please enter a valid email address.' : 'Please fill in your name, email, date, time and party size.');
+      return;
+    }
+    const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
+    const label = btn.querySelector('.label')!;
+    btn.disabled = true; label.textContent = 'Sending…';
+    const data = new FormData(form);
+    try {
+      const endpoint = form.dataset.endpoint;
+      if (endpoint) {
+        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+      } else {
+        await new Promise((r) => setTimeout(r, 700)); // demo mode
+      }
+      const d = new Date(String(data.get('date')) + 'T12:00');
+      const when = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+      document.getElementById('booking-summary')!.textContent =
+        `Table for ${data.get('guests')} on ${when} at ${data.get('time')}. We'll email ${data.get('email')} to confirm within 2 hours.`;
+      form.classList.add('hidden'); done.classList.remove('hidden'); done.classList.add('flex');
+    } catch {
+      showError('Sorry — something went wrong. Please call us or try again.');
+    } finally {
+      btn.disabled = false; label.textContent = 'Confirm Reservation';
+    }
+  });
+
+  document.getElementById('booking-again')!.addEventListener('click', () => {
+    form.reset(); timeEl.disabled = true; timeEl.innerHTML = '<option value="">Time — choose a date</option>';
+    done.classList.add('hidden'); done.classList.remove('flex'); form.classList.remove('hidden');
+  });
+</script>
