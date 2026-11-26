@@ -1,0 +1,27 @@
+---
+import StarRating from './StarRating.astro';
+import { reviews } from '../data/site';
+const tints = ['bg-secondary text-secondary-foreground', 'bg-accent/40 text-accent-foreground', 'bg-primary text-primary-foreground'];
+const initials = (n: string) => n.split(' ').map((p) => p[0]).join('').slice(0, 2);
+---
+<section id="reviews" class="px-5 sm:px-8 lg:px-16 py-16 lg:py-20">
+  <div class="text-center mb-12 reveal">
+    <h2 class="section-title">What Our Customers Say</h2>
+    <div class="flex justify-center"><StarRating /></div>
+  </div>
+  <div class="grid gap-6 md:grid-cols-3">
+    {reviews.map((r, i) => (
+      <figure class="reveal bg-surface border border-border rounded-md p-6 flex flex-col gap-4" style={`transition-delay:${i * 90}ms`}>
+        <div class="text-accent text-base leading-none" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote class="text-base text-foreground font-body leading-relaxed">“{r.review}”</blockquote>
+        <figcaption class="flex items-center gap-3 mt-auto">
+          <span class={`w-10 h-10 rounded-full grid place-items-center font-headings font-extrabold text-sm ${tints[i % tints.length]}`} aria-hidden="true">{initials(r.name)}</span>
+          <span>
+            <span class="block font-body font-medium text-sm text-foreground">{r.name}</span>
+            <span class="block font-body text-xs text-muted-foreground">{r.location}</span>
+          </span>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,43 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import SocialIcon from './SocialIcon.astro';
+import { site, footerLinks, photoCredits } from '../data/site';
+const year = new Date().getFullYear();
+const href = (label: string) => {
+  if (/clean/i.test(label)) return '#services';
+  if (/how it works/i.test(label)) return '#how-it-works';
+  if (/faq/i.test(label)) return '#faq';
+  if (/contact/i.test(label)) return '#book';
+  return '#top';
+};
+---
+<footer class="bg-foreground text-primary-foreground">
+  <div class="px-5 sm:px-8 lg:px-16 py-14 lg:py-16">
+    <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12 mb-12">
+      <div>
+        <div class="mb-4"><Logo dark /></div>
+        <p class="text-sm text-footer-muted font-body leading-relaxed mb-5">Professional residential & end-of-tenancy cleaning across {site.city}.</p>
+        <div class="flex items-center gap-3">
+          {(['instagram', 'facebook', 'x'] as const).map((s) => (
+            <a href={site.social[s]} target="_blank" rel="noopener" aria-label={s === 'x' ? 'X (Twitter)' : s[0].toUpperCase() + s.slice(1)}
+              class="w-9 h-9 rounded-full bg-white/10 grid place-items-center hover:bg-accent hover:text-accent-foreground transition-colors"><SocialIcon name={s} /></a>
+          ))}
+        </div>
+      </div>
+      {Object.entries(footerLinks).map(([heading, items]) => (
+        <nav aria-label={heading}>
+          <h2 class="font-headings font-extrabold text-sm mb-4 uppercase tracking-wide">{heading}</h2>
+          <ul class="flex flex-col gap-2.5">
+            {items.map((item) => <li><a href={href(item)} class="text-sm text-footer-muted font-body hover:text-primary-foreground transition-colors">{item}</a></li>)}
+          </ul>
+        </nav>
+      ))}
+    </div>
+    <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+      <p class="text-xs text-footer-muted font-body">© {year} {site.name} All rights reserved.</p>
+      <p class="flex items-center gap-2 text-xs text-footer-muted font-body"><Icon name="shield-check" size={14} /> Fully insured & vetted</p>
+    </div>
+    <p class="text-[10px] text-footer-muted/60 font-body mt-4">{photoCredits}</p>
+  </div>
+</footer>

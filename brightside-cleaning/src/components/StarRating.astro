@@ -1,0 +1,11 @@
+---
+import { site } from '../data/site';
+interface Props { tone?: 'default' | 'center' }
+const { rating } = site;
+---
+<div class="flex items-center gap-2" aria-label={`Rated ${rating.stars} out of 5 from ${rating.count} ${rating.label}`}>
+  <div class="flex items-center gap-0.5 text-accent text-lg leading-none" aria-hidden="true">★★★★★</div>
+  <span class="font-body font-medium text-sm text-foreground">
+    <strong>{rating.stars}</strong> <span class="text-muted-foreground">({rating.count} {rating.label})</span>
+  </span>
+</div>

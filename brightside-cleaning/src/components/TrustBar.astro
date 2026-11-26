@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+import { trust } from '../data/site';
+---
+<section class="px-5 sm:px-8 lg:px-16 py-14 lg:py-16 bg-primary text-primary-foreground" aria-label="Why choose us">
+  <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    {trust.map((t) => (
+      <li class="flex items-start gap-4">
+        <span class="w-12 h-12 rounded-full bg-white/20 shrink-0 grid place-items-center"><Icon name={t.icon} size={22} /></span>
+        <span>
+          <span class="block font-headings font-extrabold text-base">{t.title}</span>
+          <span class="block text-sm text-primary-foreground/75 font-body mt-0.5">{t.subtitle}</span>
+        </span>
+      </li>
+    ))}
+  </ul>
+</section>

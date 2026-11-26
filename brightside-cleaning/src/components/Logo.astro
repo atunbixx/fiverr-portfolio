@@ -1,0 +1,13 @@
+---
+interface Props { dark?: boolean }
+const { dark = false } = Astro.props;
+---
+<a href="#top" class="flex items-center gap-2 shrink-0" aria-label="Brightside Cleaning — home">
+  <span class="w-9 h-9 rounded-lg bg-primary grid place-items-center relative">
+    <span class="text-primary-foreground font-headings font-extrabold text-lg leading-none">B</span>
+    <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-accent"></span>
+  </span>
+  <span class={`font-headings font-extrabold text-xl ${dark ? 'text-primary-foreground' : 'text-foreground'}`}>
+    Brightside{!dark && <span class="hidden sm:inline text-primary"> Cleaning</span>}
+  </span>
+</a>

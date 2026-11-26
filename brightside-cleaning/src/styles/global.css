@@ -1,0 +1,65 @@
+@import "@fontsource-variable/nunito";
+@import "@fontsource-variable/dm-sans";
+@import "tailwindcss";
+
+/* Design tokens — taken 1:1 from the Banani "Brightside Cleaning" theme */
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #1a2e2e;
+  --color-border: #e0eded;
+  --color-input: #f4fafa;
+  --color-primary: #0d7a7a;
+  --color-primary-hover: #0a6464;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #d4f0f0;
+  --color-secondary-foreground: #0d7a7a;
+  --color-accent: #ffd438;
+  --color-accent-hover: #f5c518;
+  --color-accent-foreground: #1a2e2e;
+  --color-muted: #f0f7f7;
+  --color-muted-foreground: #5e7f7f;
+  --color-surface: #f7fdfd;
+  --color-footer-muted: #9bb5b5;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+
+  --font-body: "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-headings: "Nunito Variable", "Nunito", ui-rounded, system-ui, sans-serif;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 40px;
+  --text-5xl: 56px;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-background text-foreground font-body antialiased; }
+  ::selection { background: var(--color-accent); color: var(--color-accent-foreground); }
+  :focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  .section-title { @apply font-headings font-extrabold text-[32px] leading-tight lg:text-4xl text-foreground mb-3 text-balance; }
+  .section-lead { @apply text-muted-foreground font-body text-base lg:text-lg; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-sm font-body font-bold transition-colors hover:bg-primary-hover; }
+  .btn-accent { @apply inline-flex items-center justify-center gap-2 bg-accent text-accent-foreground rounded-sm font-body font-bold transition-colors hover:bg-accent-hover; }
+  .field { @apply w-full border border-border rounded-sm px-3 py-2.5 font-body text-sm text-foreground bg-input placeholder:text-muted-foreground/70 transition-colors focus:border-primary focus:bg-background focus:outline-none; }
+  .field-label { @apply block text-sm font-medium text-foreground mb-1.5 font-body; }
+}
+
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }

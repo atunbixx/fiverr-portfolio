@@ -1,0 +1,121 @@
+---
+import Icon from './Icon.astro';
+import { pricing, site } from '../data/site';
+const { cleanTypes, extras, defaults, limits } = pricing;
+const cur = site.currency;
+---
+<div id="quote-calc" class="bg-background rounded-md border border-border p-5 sm:p-8 shadow-[0_10px_40px_-20px_rgba(13,122,122,.35)] w-full max-w-2xl mx-auto"
+  data-pricing={JSON.stringify(pricing)} data-currency={cur}>
+  <div class="flex items-center gap-3 mb-6">
+    <span class="w-10 h-10 rounded-lg bg-secondary text-secondary-foreground grid place-items-center"><Icon name="calculator" size={20} /></span>
+    <div>
+      <h3 class="font-headings font-extrabold text-xl text-foreground">Get an Instant Quote</h3>
+      <p class="text-sm text-muted-foreground font-body">Adjust your options to see the price</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 sm:gap-6 mb-6">
+    {[
+      { key: 'bedrooms', label: 'Bedrooms', value: defaults.bedrooms, range: limits.bedrooms },
+      { key: 'bathrooms', label: 'Bathrooms', value: defaults.bathrooms, range: limits.bathrooms },
+    ].map((s) => (
+      <div>
+        <span class="field-label" id={`${s.key}-label`}>{s.label}</span>
+        <div class="flex items-center border border-border rounded-sm overflow-hidden" role="group" aria-labelledby={`${s.key}-label`}>
+          <button type="button" class="px-4 py-2.5 bg-muted text-foreground hover:bg-secondary disabled:opacity-40 disabled:hover:bg-muted transition-colors" data-step={s.key} data-dir="-1" aria-label={`Fewer ${s.label.toLowerCase()}`}><Icon name="minus" size={16} /></button>
+          <output class="flex-1 text-center py-2.5 font-body font-bold text-base border-x border-border" data-value={s.key} data-min={s.range[0]} data-max={s.range[1]} aria-live="polite">{s.value}</output>
+          <button type="button" class="px-4 py-2.5 bg-muted text-foreground hover:bg-secondary disabled:opacity-40 disabled:hover:bg-muted transition-colors" data-step={s.key} data-dir="1" aria-label={`More ${s.label.toLowerCase()}`}><Icon name="plus" size={16} /></button>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <fieldset class="mb-6">
+    <legend class="field-label">Clean Type</legend>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      {cleanTypes.map((ct) => (
+        <label class="cursor-pointer">
+          <input type="radio" name="clean-type" value={ct.id} class="peer sr-only" checked={ct.id === defaults.type} />
+          <span class="flex sm:block items-center justify-between border border-border rounded-sm px-3 py-3 text-center transition-colors hover:border-primary/50 peer-checked:border-primary peer-checked:bg-secondary peer-focus-visible:outline-3 peer-focus-visible:outline-accent [&_*]:transition-colors peer-checked:[&_.ct-label]:text-primary peer-checked:[&_.ct-price]:text-primary">
+            <span class="ct-label block text-sm font-bold font-body text-foreground">{ct.label}</span>
+            <span class="ct-price block text-xs font-body sm:mt-1 text-muted-foreground">from {cur}{ct.base}</span>
+          </span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <fieldset class="mb-6">
+    <legend class="field-label">Extras</legend>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {extras.map((ex) => (
+        <label class="cursor-pointer">
+          <input type="checkbox" name="extras" value={ex.id} class="peer sr-only" checked={defaults.extras.includes(ex.id)} />
+          <span class="flex items-center justify-between gap-3 border border-border rounded-sm px-3 py-2.5 transition-colors hover:border-primary/50 peer-checked:border-primary peer-checked:bg-secondary peer-focus-visible:outline-3 peer-focus-visible:outline-accent peer-checked:[&_.ex-text]:text-primary peer-checked:[&_.ex-text]:font-medium peer-checked:[&_.ex-tick]:bg-primary peer-checked:[&_.ex-tick]:border-primary peer-checked:[&_.ex-tick]:text-primary-foreground">
+            <span class="flex items-center gap-2.5">
+              <span class="ex-tick w-4 h-4 rounded-[4px] border border-border grid place-items-center text-transparent"><Icon name="check" size={12} /></span>
+              <span class="ex-text text-sm font-body text-foreground">{ex.label}</span>
+            </span>
+            <span class="ex-text text-sm font-body text-muted-foreground">+{cur}{ex.price}</span>
+          </span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="flex flex-wrap items-end justify-between gap-4 pt-5 border-t border-border">
+    <div>
+      <p class="text-sm text-muted-foreground font-body">Estimated total</p>
+      <p class="text-4xl font-headings font-extrabold text-primary tabular-nums" aria-live="polite"><span data-total>{cur}0</span></p>
+      <p class="text-xs text-muted-foreground font-body mt-0.5">Fixed price · includes all taxes & fees</p>
+    </div>
+    <button type="button" data-book class="btn-accent px-8 py-3.5 text-base w-full sm:w-auto">Book This Clean</button>
+  </div>
+</div>
+
+<script>
+  type CleanType = { id: string; label: string; base: number; perBedroom: number; perBathroom: number };
+  type Extra = { id: string; label: string; price: number };
+  const root = document.getElementById('quote-calc')!;
+  const p = JSON.parse(root.dataset.pricing!) as { cleanTypes: CleanType[]; extras: Extra[] };
+  const cur = root.dataset.currency!;
+  const out = (k: string) => root.querySelector<HTMLOutputElement>(`[data-value="${k}"]`)!;
+  const num = (k: string) => Number(out(k).textContent);
+
+  const state = () => {
+    const type = p.cleanTypes.find((t) => t.id === root.querySelector<HTMLInputElement>('input[name=clean-type]:checked')!.value)!;
+    const extras = p.extras.filter((e) => root.querySelector<HTMLInputElement>(`input[name=extras][value="${e.id}"]`)!.checked);
+    const bed = num('bedrooms'), bath = num('bathrooms');
+    const total = type.base + (bed - 1) * type.perBedroom + (bath - 1) * type.perBathroom + extras.reduce((s, e) => s + e.price, 0);
+    return { type, extras, bed, bath, total };
+  };
+
+  const render = () => {
+    const s = state();
+    root.querySelector('[data-total]')!.textContent = `${cur}${s.total}`;
+    root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) => {
+      const o = out(b.dataset.step!);
+      const v = Number(o.textContent), d = Number(b.dataset.dir);
+      b.disabled = d < 0 ? v <= Number(o.dataset.min) : v >= Number(o.dataset.max);
+    });
+  };
+
+  root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const o = out(b.dataset.step!);
+      const v = Math.min(Number(o.dataset.max), Math.max(Number(o.dataset.min), Number(o.textContent) + Number(b.dataset.dir)));
+      o.textContent = String(v);
+      render();
+    }),
+  );
+  root.querySelectorAll('input').forEach((i) => i.addEventListener('change', render));
+
+  root.querySelector('[data-book]')!.addEventListener('click', () => {
+    const s = state();
+    const summary = `${s.type.label} · ${s.bed} bed · ${s.bath} bath${s.extras.length ? ' · ' + s.extras.map((e) => e.label.replace(' cleaning', '')).join(', ') : ''} — ${cur}${s.total}`;
+    document.dispatchEvent(new CustomEvent('quote:selected', { detail: { summary, typeId: s.type.id } }));
+    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  render();
+</script>
