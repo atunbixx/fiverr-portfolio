@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+import { faqs } from '../data/site';
+---
+<section id="faq" class="px-5 sm:px-8 lg:px-16 py-16 lg:py-20">
+  <div class="grid gap-10 lg:grid-cols-2 lg:gap-16">
+    <div class="reveal">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <p class="section-lead mb-8">Got a question? We've got the answer. If you can't find what you're looking for, get in touch.</p>
+      <a href="#book" class="inline-flex bg-secondary text-secondary-foreground px-6 py-3 rounded-sm font-body font-medium text-sm hover:bg-primary hover:text-primary-foreground transition-colors">Contact Support</a>
+    </div>
+    <div class="reveal">
+      {faqs.map((f, i) => (
+        <details class="group border-b border-border py-5" open={i === 0} name="faq">
+          <summary class="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <h3 class="font-headings font-extrabold text-base text-foreground">{f.q}</h3>
+            <span class="w-6 h-6 rounded-full grid place-items-center shrink-0 bg-muted text-foreground group-open:bg-primary group-open:text-primary-foreground transition-colors">
+              <span class="group-open:hidden"><Icon name="plus" size={14} /></span>
+              <span class="hidden group-open:inline"><Icon name="minus" size={14} /></span>
+            </span>
+          </summary>
+          <p class="text-sm text-muted-foreground font-body mt-3 leading-relaxed">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

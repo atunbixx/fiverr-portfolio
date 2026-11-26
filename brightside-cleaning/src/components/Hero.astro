@@ -1,0 +1,32 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import StarRating from './StarRating.astro';
+import { hero } from '../data/site';
+---
+<section id="top" class="relative overflow-hidden bg-muted">
+  <div class="absolute inset-y-0 right-0 w-full lg:w-1/2">
+    <Picture src={hero.image} alt={hero.alt} widths={[640, 1024, 1600]} sizes="(min-width: 1024px) 50vw, 100vw" formats={['avif', 'webp']}
+      loading="eager" fetchpriority="high" class="w-full h-full object-cover opacity-30 lg:opacity-85" />
+    <div class="absolute inset-0 bg-gradient-to-r from-muted via-muted/80 to-transparent"></div>
+  </div>
+  <div class="relative z-10 px-5 sm:px-8 lg:px-16 pt-14 pb-16 lg:pt-20 lg:pb-24 max-w-[720px] lg:max-w-none">
+    <div class="lg:max-w-2xl">
+      <p class="inline-flex items-center gap-2 bg-accent/25 border border-accent/50 rounded-full px-4 py-1.5 mb-6 text-xs font-medium text-accent-foreground font-body">
+        {hero.badge}
+      </p>
+      <h1 class="font-headings font-extrabold text-[40px] sm:text-5xl lg:text-5xl leading-[1.08] text-foreground mb-5 text-balance">
+        {hero.titleA}<br /><span class="text-primary">{hero.titleB}</span>
+      </h1>
+      <p class="text-base sm:text-lg text-muted-foreground font-body mb-8 leading-relaxed max-w-xl">{hero.lead}</p>
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-4 mb-8">
+        <a href="#quote" class="btn-primary px-8 py-4 text-base">Get Instant Quote</a>
+        <a href="#how-it-works" class="flex items-center gap-2 text-primary font-body font-medium text-base group">
+          <span class="w-10 h-10 rounded-full bg-secondary grid place-items-center transition-transform group-hover:scale-110"><Icon name="play" size={16} /></span>
+          See how it works
+        </a>
+      </div>
+      <StarRating />
+    </div>
+  </div>
+</section>

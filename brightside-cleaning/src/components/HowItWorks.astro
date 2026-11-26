@@ -1,0 +1,23 @@
+---
+import Icon from './Icon.astro';
+import { steps } from '../data/site';
+---
+<section id="how-it-works" class="px-5 sm:px-8 lg:px-16 py-16 lg:py-20">
+  <div class="text-center mb-14 reveal">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-lead">Book a professional clean in under 2 minutes.</p>
+  </div>
+  <ol class="relative grid gap-10 md:grid-cols-3 md:gap-8 max-w-4xl mx-auto">
+    <span class="hidden md:block absolute top-8 left-[16.66%] right-[16.66%] h-px bg-border" aria-hidden="true"></span>
+    {steps.map((s, i) => (
+      <li class="reveal relative flex flex-col items-center text-center gap-4" style={`transition-delay:${i * 90}ms`}>
+        <span class="relative">
+          <span class="w-16 h-16 rounded-full bg-primary text-primary-foreground grid place-items-center ring-8 ring-background"><Icon name={s.icon} size={28} /></span>
+          <span class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-accent grid place-items-center font-headings font-extrabold text-xs text-accent-foreground">{i + 1}</span>
+        </span>
+        <h3 class="font-headings font-extrabold text-xl text-foreground">{s.title}</h3>
+        <p class="text-sm text-muted-foreground font-body leading-relaxed max-w-xs">{s.description}</p>
+      </li>
+    ))}
+  </ol>
+</section>

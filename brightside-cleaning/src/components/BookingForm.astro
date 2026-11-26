@@ -1,0 +1,146 @@
+---
+import Icon from './Icon.astro';
+import { site, pricing } from '../data/site';
+// Set PUBLIC_FORM_ENDPOINT (Web3Forms / Formspree URL) to receive real enquiries; otherwise demo mode.
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
+const contact = [
+  { icon: 'phone', label: 'Phone', value: site.phone, href: `tel:${site.phone.replace(/\s/g, '')}` },
+  { icon: 'mail', label: 'Email', value: site.email, href: `mailto:${site.email}` },
+  { icon: 'clock', label: 'Hours', value: site.hours },
+] as const;
+---
+<section id="book" class="px-5 sm:px-8 lg:px-16 py-16 lg:py-20 bg-primary/5 border-y border-border">
+  <div class="grid gap-10 lg:grid-cols-2 lg:gap-16 max-w-5xl mx-auto">
+    <div class="reveal">
+      <h2 class="section-title">Book a Clean or Get in Touch</h2>
+      <p class="section-lead mb-8">Ready to book? Fill in your details and we'll confirm your slot within the hour.</p>
+      <ul class="flex flex-col gap-4">
+        {contact.map((c) => (
+          <li class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-full bg-secondary text-secondary-foreground grid place-items-center"><Icon name={c.icon} size={18} /></span>
+            <span>
+              <span class="block text-xs text-muted-foreground font-body">{c.label}</span>
+              {'href' in c ? <a href={c.href} class="block text-base font-medium font-body text-foreground hover:text-primary">{c.value}</a>
+                : <span class="block text-base font-medium font-body text-foreground">{c.value}</span>}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="reveal bg-background border border-border rounded-md p-5 sm:p-8">
+      <form id="booking-form" class="flex flex-col gap-4" novalidate data-endpoint={endpoint}>
+        {accessKey && <input type="hidden" name="access_key" value={accessKey} />}
+        <input type="hidden" name="subject" value="New cleaning enquiry" />
+        <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+        <input type="hidden" name="quote" id="bk-quote" />
+
+        <div id="bk-quote-chip" class="hidden items-start gap-3 rounded-sm bg-secondary px-4 py-3">
+          <span class="text-secondary-foreground mt-0.5"><Icon name="calculator" size={16} /></span>
+          <span class="text-sm font-body text-foreground"><span class="block text-xs text-muted-foreground">Your quote</span><strong id="bk-quote-text"></strong></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <label><span class="field-label">First Name</span><input class="field" name="first_name" autocomplete="given-name" placeholder="Sarah" required /></label>
+          <label><span class="field-label">Last Name</span><input class="field" name="last_name" autocomplete="family-name" placeholder="Mitchell" required /></label>
+        </div>
+        <label><span class="field-label">Email Address</span><input class="field" type="email" name="email" autocomplete="email" placeholder="sarah@example.com" required /></label>
+        <div class="grid grid-cols-2 gap-4">
+          <label><span class="field-label">Postcode</span><input class="field uppercase" name="postcode" autocomplete="postal-code" placeholder="SW4 7HG" required
+            pattern="[A-Za-z]{1,2}[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}" /></label>
+          <label><span class="field-label">Preferred date</span><input class="field" type="date" name="date" id="bk-date" /></label>
+        </div>
+        <label class="relative">
+          <span class="field-label">Service Type</span>
+          <select class="field appearance-none pr-10" name="service" id="bk-service" required>
+            <option value="">Choose a service</option>
+            {pricing.cleanTypes.map((t) => <option value={t.label} data-type={t.id}>{t.label}</option>)}
+            <option value="Office Cleaning">Office Cleaning</option>
+            <option value="Carpet & Upholstery">Carpet & Upholstery</option>
+            <option value="Other">Something else</option>
+          </select>
+          <span class="pointer-events-none absolute right-3 bottom-3 text-muted-foreground"><Icon name="chevron-down" size={16} /></span>
+        </label>
+        <label><span class="field-label">Message (optional)</span><textarea class="field resize-none" name="message" rows="3" placeholder="Any special requirements..."></textarea></label>
+
+        <p id="bk-error" class="hidden text-sm font-body text-red-700" role="alert"></p>
+        <button type="submit" class="btn-primary px-6 py-3.5 text-base w-full mt-1 disabled:opacity-60"><span class="label">Send Enquiry</span></button>
+        <p class="text-xs text-muted-foreground font-body text-center">No payment needed now · we'll confirm your slot within the hour.</p>
+      </form>
+
+      <div id="booking-done" class="hidden flex-col items-center text-center gap-4 py-10" aria-live="polite">
+        <span class="grid place-items-center w-14 h-14 rounded-full bg-primary text-primary-foreground"><Icon name="check" size={26} /></span>
+        <h3 class="font-headings font-extrabold text-2xl text-foreground">Thanks — you're booked in!</h3>
+        <p id="booking-summary" class="font-body text-sm text-muted-foreground max-w-[36ch]"></p>
+        <button id="booking-again" type="button" class="text-sm font-medium text-primary hover:underline">Send another enquiry</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('booking-form') as HTMLFormElement;
+  const err = document.getElementById('bk-error')!;
+  const done = document.getElementById('booking-done')!;
+  const chip = document.getElementById('bk-quote-chip')!;
+  const service = document.getElementById('bk-service') as HTMLSelectElement;
+  const dateEl = document.getElementById('bk-date') as HTMLInputElement;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  dateEl.min = `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`;
+
+  document.addEventListener('quote:selected', (e) => {
+    const { summary, typeId } = (e as CustomEvent).detail;
+    (document.getElementById('bk-quote') as HTMLInputElement).value = summary;
+    document.getElementById('bk-quote-text')!.textContent = summary;
+    chip.classList.remove('hidden'); chip.classList.add('flex');
+    const opt = service.querySelector<HTMLOptionElement>(`option[data-type="${typeId}"]`);
+    if (opt) service.value = opt.value;
+    setTimeout(() => form.querySelector<HTMLInputElement>('input[name=first_name]')?.focus({ preventScroll: true }), 600);
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.classList.add('hidden');
+    if (!form.checkValidity()) {
+      const bad = form.querySelector(':invalid') as HTMLInputElement | null;
+      bad?.focus();
+      const msg: Record<string, string> = {
+        email: 'Please enter a valid email address.',
+        postcode: 'Please enter a valid UK postcode (e.g. SW4 7HG).',
+        service: 'Please choose a service.',
+      };
+      err.textContent = msg[bad?.name ?? ''] ?? 'Please fill in your name, email, postcode and service.';
+      err.classList.remove('hidden');
+      return;
+    }
+    const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
+    const label = btn.querySelector('.label')!;
+    btn.disabled = true; label.textContent = 'Sending…';
+    const data = new FormData(form);
+    try {
+      const endpoint = form.dataset.endpoint;
+      if (endpoint) {
+        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+      } else {
+        await new Promise((r) => setTimeout(r, 700)); // demo mode
+      }
+      const when = data.get('date') ? ` on ${new Date(String(data.get('date')) + 'T12:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}` : '';
+      document.getElementById('booking-summary')!.textContent =
+        `${data.get('first_name')}, we've received your request for ${String(data.get('service')).toLowerCase()}${when}. We'll email ${data.get('email')} within the hour to confirm.`;
+      form.classList.add('hidden'); done.classList.remove('hidden'); done.classList.add('flex');
+    } catch {
+      err.textContent = 'Sorry — something went wrong. Please call us or try again.';
+      err.classList.remove('hidden');
+    } finally {
+      btn.disabled = false; label.textContent = 'Send Enquiry';
+    }
+  });
+
+  document.getElementById('booking-again')!.addEventListener('click', () => {
+    form.reset(); chip.classList.add('hidden'); chip.classList.remove('flex');
+    done.classList.add('hidden'); done.classList.remove('flex'); form.classList.remove('hidden');
+  });
+</script>

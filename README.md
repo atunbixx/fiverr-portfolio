@@ -6,7 +6,7 @@ Each folder is a standalone [Astro](https://astro.build) + Tailwind CSS site.
 | Site | Industry | Highlights |
 |---|---|---|
 | [`maison-eclat/`](./maison-eclat) | Restaurant / bistro | Editorial design, working reservation form with live time slots, menu, hours, map, schema.org restaurant data |
-| _coming soon_ | Home services | Quote form, before/after gallery, reviews |
+| [`brightside-cleaning/`](./brightside-cleaning) | Home services / cleaning | Instant quote calculator that feeds the booking form, before/after, trust badges, service areas, FAQ, LocalBusiness schema |
 | _coming soon_ | Beauty & wellness | Booking-driven, premium minimal |
 
 ## Deploy a site to Cloudflare Pages (free)

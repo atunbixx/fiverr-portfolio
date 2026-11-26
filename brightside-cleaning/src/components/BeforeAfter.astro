@@ -1,0 +1,29 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { beforeAfter } from '../data/site';
+const sides = [
+  { ...beforeAfter.before, label: 'Before', badge: 'bg-foreground/80 left-4' },
+  { ...beforeAfter.after, label: 'After', badge: 'bg-primary right-4' },
+];
+---
+<section class="px-5 sm:px-8 lg:px-16 py-16 lg:py-20 bg-muted/60">
+  <div class="text-center mb-10 reveal">
+    <h2 class="section-title">See the Brightside Difference</h2>
+    <p class="section-lead">Cluttered to spotless — every room, every visit.</p>
+  </div>
+  <div class="max-w-4xl mx-auto reveal">
+    <div class="relative grid sm:grid-cols-2 rounded-md overflow-hidden border border-border bg-background">
+      {sides.map((s) => (
+        <figure class="relative aspect-[4/3]">
+          <Picture src={s.image} alt={s.alt} widths={[480, 800, 1100]} sizes="(min-width: 640px) 50vw, 100vw" formats={['avif', 'webp']} class="w-full h-full object-cover" />
+          <figcaption class={`absolute top-4 ${s.badge} text-primary-foreground px-3 py-1 rounded-sm text-sm font-body font-medium`}>{s.label}</figcaption>
+        </figure>
+      ))}
+      <span class="hidden sm:block absolute inset-y-0 left-1/2 w-1 -translate-x-1/2 bg-background" aria-hidden="true"></span>
+      <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-accent text-accent-foreground border-4 border-background grid place-items-center shadow-md rotate-90 sm:rotate-0" aria-hidden="true">
+        <Icon name="arrow-left-right" size={16} />
+      </span>
+    </div>
+  </div>
+</section>

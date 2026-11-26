@@ -1,0 +1,13 @@
+---
+import { areas, site } from '../data/site';
+---
+<section class="px-5 sm:px-8 lg:px-16 py-14 lg:py-16 bg-muted/60">
+  <div class="text-center mb-10 reveal">
+    <h2 class="section-title">Areas We Cover</h2>
+    <p class="section-lead">Professional cleaning across all major {site.city} neighbourhoods.</p>
+  </div>
+  <ul class="flex flex-wrap gap-2.5 sm:gap-3 justify-center max-w-4xl mx-auto reveal">
+    {areas.map((a) => <li class="bg-background border border-border rounded-full px-4 py-2 text-sm font-body text-foreground font-medium">{a}</li>)}
+  </ul>
+  <p class="text-center mt-8"><a href="#book" class="text-primary font-body font-medium text-sm hover:underline">Not listed? Check if we cover your area →</a></p>
+</section>
