@@ -1,6 +1,6 @@
-# Sable & Rose — hair salon website (portfolio demo)
+# GLOSS — hair salon website (portfolio demo)
 
-A premium, booking-driven salon website built with **Astro 5 + Tailwind CSS 4**. Hosted free on **Cloudflare Pages**.
+A booking-driven salon website built with **Astro 5 + Tailwind CSS 4**. Designed in [Banani](https://app.banani.co/flow/hOEu7RbTPbIK) and prepared for Cloudflare Pages.
 
 **What's included**
 
@@ -8,10 +8,10 @@ A premium, booking-driven salon website built with **Astro 5 + Tailwind CSS 4**.
   Slots respect opening hours, each stylist's working days, the service's duration and the current time.
   Confirmation screen with **"Add to calendar" (.ics download)**. "Book" links on the menu and stylist cards pre-fill it.
 - Live "Next available" indicator in the hero
-- Tabbed service & pricing menu (keyboard accessible), stylist cards, studio story, lookbook grid,
+- Five-category price board, stylist booking links, horizontal lookbook,
   testimonials, gift-card banner, opening hours, newsletter signup, mobile menu
 - SEO: meta + Open Graph, `HairSalon` schema.org data with opening hours and the full service/price catalogue
-- AVIF/WebP images, self-hosted fonts (Fraunces, Manrope), no third-party scripts, reduced-motion support
+- AVIF/WebP images, self-hosted fonts (wide Archivo, Inter), no third-party scripts, reduced-motion support
 
 ## Re-use for a new client
 
@@ -38,6 +38,6 @@ Connect the repo → **Root directory** `sable-and-rose` → preset Astro, build
 
 ## Credits
 
-Photos from Pexels (free licence): Anastasiya Badun, Arina Krasnikova, Max Vakhtbovych, cottonbro studio,
+Hero portrait from the GLOSS Banani design. Team and gallery photos from Pexels (free licence): Anastasiya Badun, Arina Krasnikova, Max Vakhtbovych, cottonbro studio,
 Nataliya Vaitkevich, Vladimir Vysotsky, Farouk Animashaun, Kseniia Lopyreva, Oscar Steiner, Alexander Mass,
-Beatriz Fernandes. Icons: Lucide. Sable & Rose, its stylists and reviews are fictional, created for portfolio purposes.
+Beatriz Fernandes. Icons: Lucide. GLOSS, its stylists and reviews are fictional, created for portfolio purposes.

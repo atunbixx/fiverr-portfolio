@@ -4,7 +4,7 @@ import { getImage } from 'astro:assets';
 import { site, hero, hours, menu } from '../data/site';
 interface Props { title?: string; description?: string }
 const { title = `${site.name} — ${site.tagline} in ${site.city}`, description = site.description } = Astro.props;
-const og = await getImage({ src: hero.inset, width: 1200, height: 630, format: 'jpg', fit: 'cover' });
+const og = await getImage({ src: hero.image, width: 1200, height: 630, format: 'jpg', fit: 'cover' });
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogUrl = new URL(og.src, Astro.site);
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -33,7 +33,7 @@ const jsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#f8f4ee" />
+    <meta name="theme-color" content="#0A0A0A" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -47,11 +47,5 @@ const jsonLd = {
   <body>
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 btn-ink">Skip to content</a>
     <slot />
-    <script>
-      const io = new IntersectionObserver((entries) => {
-        for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
-      }, { rootMargin: '0px 0px -8% 0px' });
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
-    </script>
   </body>
 </html>

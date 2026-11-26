@@ -7,7 +7,7 @@ Each folder is a standalone [Astro](https://astro.build) + Tailwind CSS site.
 |---|---|---|
 | [`maison-eclat/`](./maison-eclat) | Restaurant / bistro | Editorial design, working reservation form with live time slots, menu, hours, map, schema.org restaurant data |
 | [`brightside-cleaning/`](./brightside-cleaning) | Home services / cleaning | Instant quote calculator that feeds the booking form, before/after, trust badges, service areas, FAQ, LocalBusiness schema |
-| [`sable-and-rose/`](./sable-and-rose) | Hair salon / beauty | Premium editorial design, 4-step booking widget with live time slots and calendar export, tabbed price menu, stylists, lookbook, HairSalon schema |
+| [GLOSS](./sable-and-rose) | Hair salon / beauty | Editorial hair studio, 4-step booking widget with live time slots and calendar export, printed price board, stylists, lookbook, HairSalon schema |
 
 ## Deploy a site to Cloudflare Pages (free)
 

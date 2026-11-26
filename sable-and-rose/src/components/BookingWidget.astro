@@ -14,44 +14,20 @@ const config = {
   address: `${site.address.street}, ${site.address.locality}, ${site.address.region} ${site.address.postcode}`,
   name: site.name,
 };
-const steps = ['Service', 'Stylist', 'Date & time', 'Your details'];
+const steps = ['Service', 'Stylist', 'Date & time', 'Details'];
 const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ''}` : `${m}m`);
 ---
-<section id="book" class="bg-ink text-on-ink px-5 sm:px-8 lg:px-16 py-20 lg:py-28 scroll-mt-16">
-  <div class="grid lg:grid-cols-12 gap-10 lg:gap-12">
-    <div class="lg:col-span-4 reveal">
-      <p class="eyebrow !text-rose mb-4">Online booking</p>
-      <h2 class="display text-[40px] leading-[1.05] sm:text-5xl lg:text-[56px] text-balance mb-6">Book in under a <em class="italic text-rose">minute</em>.</h2>
-      <p class="text-on-ink-muted leading-relaxed mb-8 max-w-[40ch]">Choose a service, your stylist and a time that suits you. We’ll send a confirmation by email — no payment needed to book.</p>
-
-      <!-- live summary -->
-      <div class="rounded-lg border border-white/10 bg-ink-soft p-6" aria-live="polite">
-        <p class="eyebrow !text-on-ink-muted mb-4">Your appointment</p>
-        <dl class="flex flex-col gap-3 text-sm">
-          <div class="flex justify-between gap-4"><dt class="text-on-ink-muted">Service</dt><dd class="text-right font-semibold" data-sum="service">—</dd></div>
-          <div class="flex justify-between gap-4"><dt class="text-on-ink-muted">Stylist</dt><dd class="text-right font-semibold" data-sum="stylist">—</dd></div>
-          <div class="flex justify-between gap-4"><dt class="text-on-ink-muted">When</dt><dd class="text-right font-semibold" data-sum="when">—</dd></div>
-          <div class="flex justify-between gap-4 pt-3 border-t border-white/10"><dt class="text-on-ink-muted">Estimate</dt><dd class="text-right display-sm text-2xl" data-sum="price">—</dd></div>
-        </dl>
-      </div>
-    </div>
-
-    <div class="lg:col-span-8 reveal">
-      <div id="booking" class="rounded-lg bg-background text-foreground p-5 sm:p-8 lg:p-10" data-config={JSON.stringify(config)} data-endpoint={endpoint}>
-        <!-- step indicator -->
-        <ol class="grid grid-cols-4 gap-2 mb-8" aria-label="Booking steps">
-          {steps.map((s, i) => (
-            <li>
-              <button type="button" data-goto={i} disabled={i !== 0}
-                class="w-full text-left group disabled:cursor-default">
-                <span class="block h-1 rounded-full bg-border mb-2.5 overflow-hidden"><span data-bar={i} class="block h-full bg-ink transition-all duration-500" style={i === 0 ? 'width:100%' : 'width:0%'}></span></span>
-                <span class="hidden sm:block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground group-[[data-active]]:text-foreground" data-label={i}>{i + 1}. {s}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-        <p class="sm:hidden text-xs font-semibold uppercase tracking-[0.14em] mb-5" data-mobile-step>Step 1 of 4 · Service</p>
-
+<section id="book" class="section-pad booking-section">
+  <h2 class="poster-title">Book in 60 seconds</h2>
+  <div id="booking" data-config={JSON.stringify(config)} data-endpoint={endpoint}>
+    <ol class="booking-steps" aria-label="Booking steps">
+      {steps.map((step,i) => <li><button type="button" data-goto={i} disabled={i !== 0}>
+        <span>{i+1}</span>{step}
+      </button></li>)}
+    </ol>
+    <p class="sr-only" aria-live="polite" data-mobile-step></p>
+    <div class="booking-columns">
+      <div class="booking-main">
         <form id="booking-form" novalidate>
           {accessKey && <input type="hidden" name="access_key" value={accessKey} />}
           <input type="hidden" name="subject" value="New booking request" />
@@ -59,16 +35,16 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
 
           <!-- STEP 1: service -->
           <fieldset class="min-w-0" data-step="0">
-            <legend class="display-sm text-3xl mb-6">What are we doing?</legend>
+            <legend class="display-sm text-3xl mb-6">Select a service</legend>
             <div class="max-h-[440px] overflow-y-auto pr-1 -mr-1 flex flex-col gap-6 [scrollbar-width:thin]">
               {menu.map((c) => (
                 <div>
                   <p class="eyebrow mb-3">{c.label}</p>
-                  <div class="grid sm:grid-cols-2 gap-2">
+                  <div class="grid gap-2">
                     {c.services.map((s) => (
                       <label class="cursor-pointer">
                         <input type="radio" name="service" value={s.id} class="peer sr-only" />
-                        <span class="flex items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
+                        <span class="flex items-center justify-between gap-3 rounded-none border border-border bg-surface px-4 py-3 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
                           <span><span class="block text-sm font-semibold">{s.name}</span><span class="meta block text-xs text-muted-foreground mt-0.5">{fmtDur(s.duration)}</span></span>
                           <span class="text-sm font-semibold whitespace-nowrap">{s.from ? 'from ' : ''}{site.currency}{s.price}</span>
                         </span>
@@ -82,20 +58,20 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
 
           <!-- STEP 2: stylist -->
           <fieldset class="min-w-0" data-step="1" hidden>
-            <legend class="display-sm text-3xl mb-6">Who would you like?</legend>
+            <legend class="display-sm text-3xl mb-6">Choose your stylist</legend>
             <div class="grid sm:grid-cols-2 gap-3">
               <label class="cursor-pointer">
                 <input type="radio" name="stylist" value="any" class="peer sr-only" />
-                <span class="flex items-center gap-4 rounded-md border border-border bg-surface p-4 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
-                  <span class="w-14 h-14 rounded-full bg-rose-soft text-rose-deep grid place-items-center shrink-0"><Icon name="users" size={22} /></span>
+                <span class="flex items-center gap-4 rounded-none border border-border bg-surface p-4 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
+                  <span class="w-14 h-14 rounded-none bg-rose-soft text-rose-deep grid place-items-center shrink-0"><Icon name="users" size={22} /></span>
                   <span><span class="block font-semibold">First available</span><span class="meta block text-xs text-muted-foreground mt-0.5">Most choice of times</span></span>
                 </span>
               </label>
               {stylists.map((s) => (
                 <label class="cursor-pointer">
                   <input type="radio" name="stylist" value={s.id} class="peer sr-only" />
-                  <span class="flex items-center gap-4 rounded-md border border-border bg-surface p-4 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
-                    <Picture src={s.image} alt="" widths={[112]} sizes="56px" formats={['avif', 'webp']} class="w-14 h-14 rounded-full object-cover object-[50%_20%] shrink-0" />
+                  <span class="flex items-center gap-4 rounded-none border border-border bg-surface p-4 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
+                    <Picture src={s.image} alt="" widths={[112]} sizes="56px" formats={['avif', 'webp']} class="w-14 h-14 rounded-none object-cover object-[50%_20%] shrink-0" />
                     <span><span class="block font-semibold">{s.name}</span><span class="meta block text-xs text-muted-foreground mt-0.5">{s.role}</span></span>
                   </span>
                 </label>
@@ -105,23 +81,23 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
 
           <!-- STEP 3: date & time -->
           <fieldset class="min-w-0" data-step="2" hidden>
-            <legend class="display-sm text-3xl mb-6">When suits you?</legend>
+            <legend class="display-sm text-3xl mb-6">Date &amp; time</legend>
             <div class="flex items-center justify-between mb-3">
               <p class="text-sm font-semibold" data-month></p>
               <div class="flex gap-1">
-                <button type="button" data-scroll="-1" class="w-9 h-9 rounded-full border border-border grid place-items-center hover:border-ink" aria-label="Earlier dates"><Icon name="chevron-left" size={16} /></button>
-                <button type="button" data-scroll="1" class="w-9 h-9 rounded-full border border-border grid place-items-center hover:border-ink" aria-label="Later dates"><Icon name="chevron-right" size={16} /></button>
+                <button type="button" data-scroll="-1" class="w-9 h-9 rounded-none border border-border grid place-items-center hover:border-ink" aria-label="Earlier dates"><Icon name="chevron-left" size={16} /></button>
+                <button type="button" data-scroll="1" class="w-9 h-9 rounded-none border border-border grid place-items-center hover:border-ink" aria-label="Later dates"><Icon name="chevron-right" size={16} /></button>
               </div>
             </div>
             <div data-dates class="flex gap-2 overflow-x-auto pb-2 mb-6 snap-x [scrollbar-width:none]" role="radiogroup" aria-label="Date"></div>
             <p class="text-sm font-semibold mb-3">Available times</p>
             <div data-times class="grid grid-cols-3 sm:grid-cols-5 gap-2" role="radiogroup" aria-label="Time"></div>
-            <p data-no-times class="hidden text-sm text-muted-foreground py-6 text-center border border-dashed border-border rounded-md"></p>
+            <p data-no-times class="hidden text-sm text-muted-foreground py-6 text-center border border-dashed border-border rounded-none"></p>
           </fieldset>
 
           <!-- STEP 4: details -->
           <fieldset class="min-w-0" data-step="3" hidden>
-            <legend class="display-sm text-3xl mb-6">Almost done.</legend>
+            <legend class="display-sm text-3xl mb-6">Your details</legend>
             <div class="grid sm:grid-cols-2 gap-4">
               <label><span class="block text-sm font-semibold mb-1.5">First name</span><input class="field" name="first_name" autocomplete="given-name" required /></label>
               <label><span class="block text-sm font-semibold mb-1.5">Last name</span><input class="field" name="last_name" autocomplete="family-name" required /></label>
@@ -129,7 +105,7 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
               <label><span class="block text-sm font-semibold mb-1.5">Mobile</span><input class="field" type="tel" name="phone" autocomplete="tel" required placeholder="(512) 555-0100" /></label>
               <label class="sm:col-span-2"><span class="block text-sm font-semibold mb-1.5">Anything we should know? <span class="font-normal text-muted-foreground">(optional)</span></span><textarea class="field resize-none" name="notes" rows="3" placeholder="Inspiration photos, allergies, current colour…"></textarea></label>
               <label class="sm:col-span-2 flex items-center gap-3 cursor-pointer text-sm">
-                <input type="checkbox" name="new_client" value="yes" class="w-4 h-4 accent-[#171412]" /> I’m a new client (15% off your first colour service)
+                <input type="checkbox" name="new_client" value="yes" class="w-4 h-4 accent-ink" /> I’m a new client (15% off your first colour service)
               </label>
             </div>
           </fieldset>
@@ -142,17 +118,19 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
           </div>
         </form>
 
-        <!-- DONE -->
-        <div data-done hidden class="text-center py-8">
-          <span class="mx-auto mb-6 w-16 h-16 rounded-full bg-ink text-on-ink grid place-items-center"><Icon name="check" size={28} /></span>
-          <h3 class="display text-4xl mb-3">You’re booked in.</h3>
-          <p data-done-text class="text-muted-foreground max-w-[44ch] mx-auto mb-8"></p>
-          <div class="flex flex-wrap justify-center gap-3">
-            <button type="button" data-ics class="btn-ink"><Icon name="calendar-plus" size={16} /> Add to calendar</button>
+        <div data-done hidden tabindex="-1">
+          <span class="done-check"><Icon name="check" size={32} /></span>
+          <h3>You’re booked.</h3><p data-done-text></p>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" data-ics class="btn-ink">Add to calendar</button>
             <button type="button" data-restart class="btn-ghost">Book another</button>
           </div>
         </div>
       </div>
+      <aside class="receipt" aria-live="polite" aria-label="Appointment summary">
+        <dl>{['Service','Stylist','When','Estimate'].map(label =>
+          <div><dt>{label}</dt><dd data-sum={label === 'Estimate' ? 'price' : label.toLowerCase()}>—</dd></div>)}</dl>
+      </aside>
     </div>
   </div>
 </section>
@@ -173,7 +151,7 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
   const nextBtn = root.querySelector<HTMLButtonElement>('[data-next]')!;
   const backBtn = root.querySelector<HTMLButtonElement>('[data-back]')!;
   const errEl = root.querySelector<HTMLElement>('[data-error]')!;
-  const labels = ['Service', 'Stylist', 'Date & time', 'Your details'];
+  const labels = ['Service', 'Stylist', 'Date & time', 'Details'];
 
   const st = { step: 0, service: '', stylist: '', date: '', time: '', assigned: '' };
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -217,7 +195,7 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
       const b = document.createElement('button');
       b.type = 'button'; b.dataset.date = iso(d); b.disabled = !available;
       b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(st.date === iso(d)));
-      b.className = 'snap-start shrink-0 w-[68px] rounded-md border py-3 text-center transition-colors border-border bg-surface hover:border-ink/40 disabled:opacity-35 disabled:hover:border-border disabled:cursor-not-allowed aria-checked:bg-ink aria-checked:text-on-ink aria-checked:border-ink';
+      b.className = 'snap-start shrink-0 w-[68px] rounded-none border py-3 text-center transition-colors border-border bg-surface hover:border-ink/40 disabled:opacity-35 disabled:hover:border-border disabled:cursor-not-allowed aria-checked:bg-ink aria-checked:text-on-ink aria-checked:border-ink';
       b.innerHTML = `<span class="block text-[11px] font-semibold uppercase tracking-wider opacity-70">${d.toLocaleDateString('en-US', { weekday: 'short' })}</span><span class="block display-sm text-2xl leading-tight">${d.getDate()}</span><span class="block text-[10px] opacity-60">${available ? d.toLocaleDateString('en-US', { month: 'short' }) : (cfg.hours[d.getDay()] ? 'Full' : 'Closed')}</span>`;
       b.addEventListener('click', () => { st.date = iso(d); st.time = ''; renderDates(); renderTimes(); update(); });
       datesEl.appendChild(b);
@@ -237,7 +215,7 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
       const b = document.createElement('button');
       b.type = 'button'; b.textContent = fmtTime(t);
       b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(st.time === String(t)));
-      b.className = 'rounded-md border border-border bg-surface py-2.5 text-sm font-semibold transition-colors hover:border-ink/40 aria-checked:bg-ink aria-checked:text-on-ink aria-checked:border-ink';
+      b.className = 'rounded-none border border-border bg-surface py-2.5 text-sm font-semibold transition-colors hover:border-ink/40 aria-checked:bg-ink aria-checked:text-on-ink aria-checked:border-ink';
       b.addEventListener('click', () => { st.time = String(t); st.assigned = who; renderTimes(); update(); });
       timesEl.appendChild(b);
     });
@@ -269,10 +247,11 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
   const show = (i: number) => {
     st.step = i;
     steps.forEach((f, j) => (f.hidden = j !== i));
-    root.querySelectorAll<HTMLElement>('[data-bar]').forEach((b) => (b.style.width = Number(b.dataset.bar) <= i ? '100%' : '0%'));
     root.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((b) => {
       const j = Number(b.dataset.goto);
-      b.disabled = j > i; b.toggleAttribute('data-active', j <= i);
+      b.disabled = j > i;
+      if (j === i) b.setAttribute('aria-current', 'step');
+      else b.removeAttribute('aria-current');
     });
     root.querySelector('[data-mobile-step]')!.textContent = `Step ${i + 1} of 4 · ${labels[i]}`;
     backBtn.classList.toggle('invisible', i === 0);
@@ -314,9 +293,10 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
         await new Promise((r) => setTimeout(r, 800)); // demo mode
       }
       root.querySelector('[data-done-text]')!.textContent =
-        `${data.get('first_name')}, your ${s.name.toLowerCase()} with ${stylistName(who).split(' ')[0]} is requested for ${whenText()}. A confirmation is on its way to ${data.get('email')}.`;
+        `${s.name} with ${stylistName(who)} · ${whenText()} · ${s.from ? 'From ' : ''}${cfg.currency}${s.price}`;
       form.hidden = true; root.querySelector('ol')!.hidden = true; root.querySelector<HTMLElement>('[data-mobile-step]')!.hidden = true;
-      root.querySelector<HTMLElement>('[data-done]')!.hidden = false;
+      const done = root.querySelector<HTMLElement>('[data-done]')!;
+      done.hidden = false; done.focus({ preventScroll: true });
     } catch {
       errEl.textContent = 'Sorry — something went wrong. Please call us or try again.';
       errEl.classList.remove('hidden');
@@ -331,12 +311,12 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
     const start = new Date(y, m - 1, d, 0, Number(st.time)); const end = new Date(start.getTime() + s.duration * 60000);
     const f = (x: Date) => `${x.getFullYear()}${pad(x.getMonth() + 1)}${pad(x.getDate())}T${pad(x.getHours())}${pad(x.getMinutes())}00`;
     const who = stylistName(st.stylist === 'any' ? st.assigned : st.stylist);
-    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Sable & Rose//Booking//EN', 'BEGIN:VEVENT',
-      `UID:${Date.now()}@sableandrose.studio`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//GLOSS//Booking//EN', 'BEGIN:VEVENT',
+      `UID:${Date.now()}@gloss.studio`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
       `DTSTART:${f(start)}`, `DTEND:${f(end)}`, `SUMMARY:${s.name} with ${who} — ${cfg.name}`, `LOCATION:${cfg.address.replace(/,/g, '\\,')}`,
       'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })); a.download = 'sable-and-rose-appointment.ics'; a.click();
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })); a.download = 'gloss-appointment.ics'; a.click();
   });
   root.querySelector('[data-restart]')!.addEventListener('click', () => {
     form.reset(); Object.assign(st, { service: '', stylist: '', date: '', time: '', assigned: '' });
@@ -346,6 +326,7 @@ const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m
 
   // Presets from "Book" links elsewhere on the page
   document.addEventListener('book:preset', (e) => {
+    if (form.hidden) root.querySelector<HTMLButtonElement>('[data-restart]')!.click();
     const { service, stylist } = (e as CustomEvent).detail as { service?: string; stylist?: string };
     if (service) { st.service = service; form.querySelector<HTMLInputElement>(`input[name=service][value="${service}"]`)!.checked = true; }
     if (stylist) { st.stylist = stylist; form.querySelector<HTMLInputElement>(`input[name=stylist][value="${stylist}"]`)!.checked = true; }

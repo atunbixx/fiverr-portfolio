@@ -1,29 +1,20 @@
 ---
 import Icon from './Icon.astro';
 import Wordmark from './Wordmark.astro';
-import { nav, site } from '../data/site';
+import { nav } from '../data/site';
 ---
-<div class="bg-ink text-on-ink text-center px-4 py-2.5 text-xs font-medium tracking-wide">
-  {site.offer} · <a href="#book" class="underline underline-offset-4 decoration-rose hover:text-rose">Book now</a>
-</div>
-<header class="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border/70">
-  <nav class="flex items-center justify-between gap-4 px-5 sm:px-8 lg:px-16 py-3.5" aria-label="Main">
+<header class="masthead">
+  <nav aria-label="Main">
     <Wordmark />
-    <ul class="hidden md:flex items-center gap-9">
-      {nav.map((l) => <li><a href={l.href} class="text-sm font-medium text-foreground/75 hover:text-foreground transition-colors">{l.label}</a></li>)}
-    </ul>
+    <ul class="desktop-nav">{nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
     <div class="flex items-center gap-2">
-      <a href="#book" class="btn-ink px-5 py-2.5 whitespace-nowrap">Book now</a>
-      <button id="nav-toggle" type="button" class="md:hidden p-2 -mr-2" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
-        <span class="icon-open"><Icon name="menu" size={22} /></span><span class="icon-close hidden"><Icon name="x" size={22} /></span>
+      <a href="#book" class="btn-red">Book<span class="hidden sm:inline">&nbsp;now</span></a>
+      <button id="nav-toggle" class="md:hidden p-2" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+        <span class="icon-open"><Icon name="menu" /></span><span class="icon-close hidden"><Icon name="x" /></span>
       </button>
     </div>
   </nav>
-  <div id="mobile-nav" class="md:hidden hidden border-t border-border bg-background">
-    <ul class="px-5 sm:px-8 py-2">
-      {nav.map((l) => <li><a href={l.href} class="block py-3.5 display-sm text-2xl border-b border-border last:border-0">{l.label}</a></li>)}
-    </ul>
-  </div>
+  <div id="mobile-nav" class="hidden md:hidden"><ul>{nav.map(l => <li><a href={l.href}>{l.label}</a></li>)}</ul></div>
 </header>
 <script>
   const btn = document.getElementById('nav-toggle')!;

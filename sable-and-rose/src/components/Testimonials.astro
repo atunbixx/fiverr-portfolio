@@ -1,22 +1,8 @@
 ---
-import Icon from './Icon.astro';
-import { testimonials, site } from '../data/site';
+import { testimonials } from '../data/site';
 ---
-<section class="px-5 sm:px-8 lg:px-16 py-20 lg:py-28">
-  <div class="text-center mb-14 reveal">
-    <p class="eyebrow mb-4">Kind words</p>
-    <h2 class="h2">{site.rating} stars from {site.reviewCount} <em class="italic text-rose-deep">regulars</em></h2>
-  </div>
-  <div class="grid gap-6 md:grid-cols-3">
-    {testimonials.map((t, i) => (
-      <figure class="reveal flex flex-col rounded-lg border border-border bg-surface p-8" style={`transition-delay:${i * 90}ms`}>
-        <span class="display text-7xl leading-none text-rose -mb-4" aria-hidden="true">“</span>
-        <blockquote class="display-sm text-xl leading-snug text-foreground mb-8">{t.quote}</blockquote>
-        <figcaption class="mt-auto flex items-center justify-between gap-4 pt-5 border-t border-border">
-          <span><span class="block font-semibold text-sm">{t.name}</span><span class="block text-xs text-muted-foreground">{t.service}</span></span>
-          <span class="flex text-rose-deep" aria-label="5 out of 5 stars">{[1,2,3,4,5].map(() => <Icon name="star" size={13} class="fill-current" />)}</span>
-        </figcaption>
-      </figure>
-    ))}
-  </div>
+<section class="reviews section-pad" aria-label="Client reviews">
+  {testimonials.map(t => <figure>
+    <span aria-hidden="true">“</span><blockquote>{t.quote}</blockquote><figcaption>{t.name}, {t.service}</figcaption>
+  </figure>)}
 </section>

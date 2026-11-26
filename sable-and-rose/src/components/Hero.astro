@@ -1,56 +1,19 @@
 ---
 import { Picture } from 'astro:assets';
-import Icon from './Icon.astro';
-import { hero, site, hours } from '../data/site';
+import { hero, hours } from '../data/site';
 ---
-<section id="top" class="relative overflow-hidden px-5 sm:px-8 lg:px-16 pt-12 pb-16 lg:pt-16 lg:pb-24">
-  <div class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-    <div class="lg:col-span-6 xl:col-span-6 relative z-10">
-      <p class="eyebrow mb-6">{site.tagline} · {site.city}</p>
-      <h1 class="display text-[52px] leading-[0.98] sm:text-7xl xl:text-[92px] text-foreground mb-7">
-        Hair that feels like <em class="italic text-rose-deep font-light">you</em>, only&nbsp;more.
-      </h1>
-      <p class="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-[46ch] mb-9">
-        Precision cuts, lived-in colour and textured-hair expertise in a calm, light-filled East Austin studio.
-      </p>
-      <div class="flex flex-wrap items-center gap-3 mb-10">
-        <a href="#book" class="btn-ink">Book an appointment <Icon name="arrow-right" size={16} /></a>
-        <a href="#services" class="btn-ghost">View the menu</a>
-      </div>
-      <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
-        <div class="flex items-center gap-3">
-          <span class="flex text-rose-deep" aria-hidden="true">{[1,2,3,4,5].map(() => <Icon name="star" size={15} class="fill-current" />)}</span>
-          <span class="text-sm"><strong class="font-semibold">{site.rating}</strong> <span class="text-muted-foreground">on Google · {site.reviewCount} reviews</span></span>
-        </div>
-        <p id="next-available" class="hidden items-center gap-2 text-sm" data-hours={JSON.stringify(hours)}>
-          <span class="relative flex w-2.5 h-2.5"><span class="absolute inset-0 rounded-full bg-emerald-500/50 animate-ping"></span><span class="relative w-2.5 h-2.5 rounded-full bg-emerald-600"></span></span>
-          <span class="text-muted-foreground">Next available:</span> <strong class="font-semibold" data-slot></strong>
-        </p>
-      </div>
+<section id="top" class="hero">
+  <div class="hero-copy">
+    <h1><span>Sharp cuts.</span><span>Loud colour.</span><span>No fuss.</span></h1>
+    <p>Precision cuts, colour and textured hair in East Austin.</p>
+    <div class="flex flex-wrap gap-3">
+      <a class="btn-red" href="#book">Book a chair</a>
+      <a class="btn-ghost" href="#services">See the menu</a>
     </div>
-
-    <div class="lg:col-span-6 relative">
-      <div class="relative ml-auto w-[82%] sm:w-[70%] lg:w-[78%] max-w-[480px]">
-        <div class="arch overflow-hidden aspect-[3/4] bg-ink">
-          <Picture src={hero.image} alt={hero.imageAlt} widths={[480, 760, 1100]} sizes="(min-width: 1024px) 36vw, 80vw" formats={['avif', 'webp']}
-            loading="eager" fetchpriority="high" class="w-full h-full object-cover object-[50%_35%]" />
-        </div>
-        <div class="absolute -left-[22%] bottom-[8%] w-[48%] aspect-square rounded-full overflow-hidden border-[6px] border-background shadow-[0_20px_50px_-20px_rgba(23,20,18,.45)]">
-          <Picture src={hero.inset} alt={hero.insetAlt} widths={[300, 500]} sizes="20vw" formats={['avif', 'webp']} loading="eager" class="w-full h-full object-cover object-[60%_40%]" />
-        </div>
-        <!-- rotating badge -->
-        <div class="absolute -top-6 -right-4 sm:-right-8 w-28 h-28 sm:w-32 sm:h-32" aria-hidden="true">
-          <svg viewBox="0 0 120 120" class="w-full h-full animate-spin-slow">
-            <defs><path id="circle" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" /></defs>
-            <circle cx="60" cy="60" r="59" fill="#e7c9bf" />
-            <text font-family="Manrope Variable, sans-serif" font-size="10.5" font-weight="600" letter-spacing="3.2" fill="#171412">
-              <textPath href="#circle">EST. {site.founded} · EAST AUSTIN · SABLE & ROSE ·</textPath>
-            </text>
-          </svg>
-          <span class="absolute inset-0 grid place-items-center display italic text-2xl text-ink">S&amp;R</span>
-        </div>
-      </div>
-    </div>
+  </div>
+  <div class="hero-photo">
+    <Picture src={hero.image} alt={hero.imageAlt} widths={[480,780,1024]} sizes="(min-width: 768px) 42vw, 100vw" formats={['avif','webp']} loading="eager" fetchpriority="high" />
+    <p id="next-available" class="hidden" data-hours={JSON.stringify(hours)}>Next chair: <strong data-slot></strong></p>
   </div>
 </section>
 <script>
@@ -68,7 +31,7 @@ import { hero, site, hours } from '../data/site';
     if (start + 60 > toMin(h.close)) continue;
     const t = new Date(d); t.setHours(Math.floor(start / 60), start % 60, 0, 0);
     const day = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : t.toLocaleDateString('en-US', { weekday: 'long' });
-    el.querySelector('[data-slot]')!.textContent = `${day}, ${t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    el.querySelector('[data-slot]')!.textContent = `${day} ${t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
     el.classList.remove('hidden'); el.classList.add('flex');
     break;
   }

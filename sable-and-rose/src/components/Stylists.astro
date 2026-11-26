@@ -2,29 +2,15 @@
 import { Picture } from 'astro:assets';
 import { stylists } from '../data/site';
 ---
-<section id="stylists" class="px-5 sm:px-8 lg:px-16 py-20 lg:py-28">
-  <div class="flex flex-wrap items-end justify-between gap-6 mb-12 reveal">
-    <div>
-      <p class="eyebrow mb-4">The Team</p>
-      <h2 class="h2">Meet your <em class="italic text-rose-deep">stylists</em></h2>
-    </div>
-    <a href="#book" class="link-arrow">Book with anyone</a>
-  </div>
-  <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-    {stylists.map((s, i) => (
-      <article class="reveal group" style={`transition-delay:${i * 90}ms`}>
-        <div class="arch overflow-hidden aspect-[4/5] mb-6 bg-sand">
-          <Picture src={s.image} alt={s.alt} widths={[400, 700, 1000]} sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" formats={['avif', 'webp']}
-            class="w-full h-full object-cover object-[50%_20%] transition-transform duration-700 group-hover:scale-[1.04]" />
-        </div>
-        <h3 class="display-sm text-3xl mb-1">{s.name}</h3>
-        <p class="text-sm text-muted-foreground mb-4">{s.role}</p>
-        <ul class="flex flex-wrap gap-2 mb-5">
-          {s.specialties.map((t) => <li class="rounded-full bg-rose-soft text-rose-deep text-xs font-semibold px-3 py-1.5">{t}</li>)}
-        </ul>
-        <a href="#book" data-book-stylist={s.id} class="link-arrow">Book with {s.name.split(' ')[0]}</a>
-      </article>
-    ))}
+<section id="stylists" class="section-pad dark">
+  <h2 class="poster-title">The team</h2>
+  <div class="team-grid">
+    {stylists.map(s => <article>
+      <Picture src={s.image} alt={s.alt} widths={[400,700,1000]} sizes="(min-width:768px) 30vw, 90vw" formats={['avif','webp']} />
+      <h3>{s.name}</h3><p>{s.role}</p>
+      <ul>{s.specialties.map(t => <li>{t}</li>)}</ul>
+      <a href="#book" data-book-stylist={s.id}>Book with {s.name.split(' ')[0]} →</a>
+    </article>)}
   </div>
 </section>
 <script>

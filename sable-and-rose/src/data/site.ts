@@ -1,6 +1,5 @@
 // All business content lives here — swap this file to re-skin the template for a new client.
-import heroHair from '../assets/img/hero-hair.jpg';
-import heroInset from '../assets/img/hero-inset.jpg';
+import heroHair from '../assets/img/gloss-hero.jpg';
 import studioImg from '../assets/img/studio.jpg';
 import avaImg from '../assets/img/stylist-ava.jpg';
 import marcoImg from '../assets/img/stylist-marco.jpg';
@@ -13,35 +12,32 @@ import lookWaves from '../assets/img/look-waves.jpg';
 import lookCurls from '../assets/img/look-curls.jpg';
 
 export const site = {
-  name: 'Sable & Rose',
-  tagline: 'Hair & Beauty Studio',
+  name: 'GLOSS',
+  tagline: 'Hair Studio',
   city: 'Austin, TX',
   description:
-    'Sable & Rose is a calm, light-filled hair studio in East Austin — precision cuts, lived-in colour, textured hair and bridal styling. Book online in under a minute.',
+    'Precision cuts, colour and textured hair in East Austin. Explore the menu, meet your stylist and book a chair at GLOSS.',
   phone: '(512) 555-0147',
-  email: 'hello@sableandrose.studio',
+  email: 'hello@gloss.studio',
   address: { street: '2118 E Cesar Chavez St', locality: 'Austin', region: 'TX', postcode: '78702', country: 'US' },
-  instagram: '@sableandrose',
-  social: { instagram: 'https://instagram.com/', tiktok: 'https://tiktok.com/', pinterest: 'https://pinterest.com/' },
+  instagram: '@gloss.atx',
+  social: { instagram: 'https://instagram.com/gloss.atx/', tiktok: 'https://tiktok.com/', pinterest: 'https://pinterest.com/' },
   rating: '4.9',
   reviewCount: '600+',
   founded: 2016,
   currency: '$',
-  offer: 'New clients — 15% off your first colour service',
 };
 
 export const nav = [
-  { label: 'Services', href: '#services' },
-  { label: 'Stylists', href: '#stylists' },
-  { label: 'Lookbook', href: '#lookbook' },
+  { label: 'Menu', href: '#services' },
+  { label: 'Team', href: '#stylists' },
+  { label: 'Work', href: '#lookbook' },
   { label: 'Visit', href: '#visit' },
 ];
 
 export const hero = {
   image: heroHair,
-  imageAlt: 'Glossy, healthy brown hair seen from behind against a dark backdrop',
-  inset: heroInset,
-  insetAlt: 'Side profile of a woman with soft pink balayage',
+  imageAlt: 'Profile of a model with a sculpted violet crop against a violet backdrop',
 };
 
 // Weekly hours. Day index: 0 = Sunday … 6 = Saturday. null = closed.
@@ -91,9 +87,9 @@ export const menu: { id: string; label: string; services: Service[] }[] = [
   },
   {
     id: 'treatments', label: 'Treatments', services: [
-      { id: 'tr-olaplex', name: 'Bond Repair Treatment', description: 'Rebuilds strength after colour or heat.', duration: 30, price: 45 },
-      { id: 'tr-scalp', name: 'Scalp Detox Ritual', description: 'Exfoliating scalp treatment with massage.', duration: 45, price: 60 },
-      { id: 'tr-keratin', name: 'Smoothing Keratin', description: 'Frizz-free, faster blow-dries for up to 4 months.', duration: 150, price: 280, from: true },
+      { id: 'tr-olaplex', name: 'Bond Repair', description: 'Rebuilds strength after colour or heat.', duration: 30, price: 45 },
+      { id: 'tr-scalp', name: 'Scalp Detox', description: 'Exfoliating scalp treatment with massage.', duration: 45, price: 60 },
+      { id: 'tr-keratin', name: 'Keratin', description: 'Frizz-free, faster blow-dries for up to 4 months.', duration: 150, price: 280, from: true },
     ],
   },
   {
@@ -124,16 +120,16 @@ export const studio = {
 export const lookbook = [
   { image: lookBraids, alt: 'Long knotless braids with silver cuffs', label: 'Knotless braids', tall: true },
   { image: lookBridal, alt: 'Soft romantic bridal updo, black and white', label: 'Bridal updo', tall: false },
-  { image: lookColour, alt: 'Vivid violet sculpted short cut', label: 'Vivid colour', tall: false },
-  { image: lookAfro, alt: 'Full, defined natural afro', label: 'Natural curls', tall: true },
+  { image: lookColour, alt: 'Vivid violet sculpted short cut', label: 'Vivid violet cut', tall: false },
+  { image: lookAfro, alt: 'Full, defined natural afro', label: 'Natural afro', tall: true },
   { image: lookWaves, alt: 'Stylist curling long glossy waves', label: 'Glossy waves', tall: false },
-  { image: lookCurls, alt: 'Long defined curls with braided detail', label: 'Curl definition', tall: false },
+  { image: lookCurls, alt: 'Long defined curls with braided detail', label: 'Defined curls', tall: false },
 ];
 
 export const testimonials = [
-  { quote: 'Ava completely transformed my brassy highlights into the softest balayage. I get compliments every single day.', name: 'Jordan M.', service: 'Balayage' },
-  { quote: 'Finally a studio that truly understands curly hair. Marco cut every curl individually — it has never sat better.', name: 'Danielle K.', service: 'Curly Cut' },
-  { quote: 'Lena did my wedding hair and it held through 12 hours of Texas heat and dancing. Calm, kind and so talented.', name: 'Sofia R.', service: 'Wedding Day Hair' },
+  { quote: 'Ava turned my brassy highlights into the softest balayage.', name: 'Jordan M.', service: 'Balayage' },
+  { quote: 'Finally a studio that gets curly hair. Marco cut every curl.', name: 'Danielle K.', service: 'Curly Cut' },
+  { quote: 'My wedding hair survived 12 hours of Texas heat.', name: 'Sofia R.', service: 'Wedding Day Hair' },
 ];
 
 export const photoCredits =

@@ -1,23 +1,27 @@
 ---
 import { Picture } from 'astro:assets';
-import Icon from './Icon.astro';
 import { lookbook, site } from '../data/site';
 ---
-<section id="lookbook" class="px-5 sm:px-8 lg:px-16 py-20 lg:py-28 bg-sand/60 border-y border-border">
-  <div class="flex flex-wrap items-end justify-between gap-6 mb-12 reveal">
-    <div>
-      <p class="eyebrow mb-4">Lookbook</p>
-      <h2 class="h2">Recent <em class="italic text-rose-deep">work</em></h2>
-    </div>
-    <a href={site.social.instagram} target="_blank" rel="noopener" class="link-arrow">Follow {site.instagram} <Icon name="arrow-up-right" size={14} /></a>
+<section id="lookbook" class="section-pad">
+  <div class="work-heading">
+    <h2 class="poster-title">Recent work</h2>
+    <a href={site.social.instagram}>Follow {site.instagram} ↗</a>
   </div>
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [grid-auto-rows:180px] sm:[grid-auto-rows:240px] lg:[grid-auto-rows:220px]">
-    {lookbook.map((l, i) => (
-      <figure class:list={['reveal group relative overflow-hidden rounded-md bg-ink', l.tall ? 'row-span-2' : 'row-span-1']} style={`transition-delay:${(i % 4) * 70}ms`}>
-        <Picture src={l.image} alt={l.alt} widths={[400, 700, 1000, 1400]} sizes="(min-width: 1024px) 36vw, 80vw" formats={['avif', 'webp']}
-          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.05]" />
-        <figcaption class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-ink/75 to-transparent text-on-ink display italic text-lg opacity-100 lg:opacity-0 lg:translate-y-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">{l.label}</figcaption>
-      </figure>
-    ))}
+  <div class="work-arrows">
+    <button data-direction="-1" aria-label="Previous photograph" aria-controls="work-strip">←</button>
+    <button data-direction="1" aria-label="Next photograph" aria-controls="work-strip">→</button>
+  </div>
+  <div id="work-strip" tabindex="0" aria-label="Recent hair looks" role="region">
+    {lookbook.map((l,i) => <figure>
+      <Picture src={l.image} alt={l.alt} widths={[400,700,1000]} sizes="(min-width:768px) 30vw, 80vw" formats={['avif','webp']} />
+      <figcaption>{String(i+1).padStart(2,'0')} — {l.label}</figcaption>
+    </figure>)}
   </div>
 </section>
+<script>
+  const row = document.getElementById('work-strip')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-direction]').forEach(button => button.addEventListener('click', () => {
+    const [first, second] = row.querySelectorAll('figure');
+    row.scrollBy({ left: (second.offsetLeft - first.offsetLeft) * Number(button.dataset.direction) });
+  }));
+</script>
