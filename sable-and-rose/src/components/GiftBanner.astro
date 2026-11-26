@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+<section class="px-5 sm:px-8 lg:px-16 pb-20 lg:pb-28">
+  <div class="reveal relative overflow-hidden rounded-lg bg-rose px-6 sm:px-12 py-14 lg:py-16 grid lg:grid-cols-12 gap-8 items-center">
+    <svg class="absolute -right-16 -top-16 w-72 h-72 text-rose-deep/15" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="98" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="100" cy="100" r="70" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="100" cy="100" r="42" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    <div class="lg:col-span-8 relative">
+      <p class="eyebrow !text-ink/70 mb-3 flex items-center gap-2"><Icon name="gift" size={14} /> Gift cards</p>
+      <h2 class="display text-4xl sm:text-5xl leading-[1.05] text-ink text-balance">Give someone the gift of a <em class="italic">really</em> good hair day.</h2>
+    </div>
+    <div class="lg:col-span-4 lg:justify-self-end relative">
+      <a href={`mailto:${site.email}?subject=Gift%20card`} class="btn-ink">Buy a gift card <Icon name="arrow-right" size={16} /></a>
+    </div>
+  </div>
+</section>

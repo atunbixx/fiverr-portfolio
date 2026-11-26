@@ -1,0 +1,49 @@
+---
+import Wordmark from './Wordmark.astro';
+import { site, nav, photoCredits } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="bg-ink text-on-ink px-5 sm:px-8 lg:px-16 pt-20 pb-10">
+  <div class="grid gap-12 lg:grid-cols-12 mb-16">
+    <div class="lg:col-span-6">
+      <Wordmark light size="lg" />
+      <p class="text-on-ink-muted mt-5 max-w-[40ch] leading-relaxed">{site.tagline} in {site.city}. Precision cuts, lived-in colour and textured-hair care since {site.founded}.</p>
+    </div>
+    <div class="lg:col-span-6">
+      <p class="font-semibold mb-2">Notes from the chair</p>
+      <p class="text-sm text-on-ink-muted mb-4">Seasonal colour trends, care tips and the occasional last-minute opening. Monthly, never spammy.</p>
+      <form id="newsletter" class="flex flex-col sm:flex-row gap-2" novalidate>
+        <label class="sr-only" for="nl-email">Email address</label>
+        <input id="nl-email" type="email" required placeholder="you@example.com" class="flex-1 rounded-full bg-ink-soft border border-white/15 px-5 py-3.5 text-sm placeholder:text-on-ink-muted/70 focus:border-rose focus:outline-none" />
+        <button class="rounded-full bg-rose text-ink font-semibold text-sm px-6 py-3.5 hover:bg-on-ink transition-colors">Subscribe</button>
+      </form>
+      <p id="nl-msg" class="text-sm text-rose mt-3 min-h-5" aria-live="polite"></p>
+    </div>
+  </div>
+  <div class="flex flex-col md:flex-row gap-6 md:items-center justify-between pt-8 border-t border-white/10">
+    <ul class="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+      {nav.map((l) => <li><a href={l.href} class="text-on-ink-muted hover:text-on-ink">{l.label}</a></li>)}
+      <li><a href="#book" class="text-on-ink-muted hover:text-on-ink">Book</a></li>
+    </ul>
+    <ul class="flex gap-6 text-sm">
+      <li><a href={site.social.instagram} target="_blank" rel="noopener" class="text-on-ink-muted hover:text-rose">Instagram</a></li>
+      <li><a href={site.social.tiktok} target="_blank" rel="noopener" class="text-on-ink-muted hover:text-rose">TikTok</a></li>
+      <li><a href={site.social.pinterest} target="_blank" rel="noopener" class="text-on-ink-muted hover:text-rose">Pinterest</a></li>
+    </ul>
+  </div>
+  <div class="mt-8 flex flex-col sm:flex-row justify-between gap-2 text-xs text-on-ink-muted/80">
+    <p>© {year} {site.name}. All rights reserved.</p>
+    <p>{site.address.street}, {site.address.locality}, {site.address.region}</p>
+  </div>
+  <p class="text-[10px] text-on-ink-muted/50 mt-4">{photoCredits}</p>
+</footer>
+<script>
+  const f = document.getElementById('newsletter') as HTMLFormElement;
+  const msg = document.getElementById('nl-msg')!;
+  f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = f.querySelector('input')!;
+    if (!input.checkValidity()) { msg.textContent = 'Please enter a valid email address.'; input.focus(); return; }
+    msg.textContent = "You're on the list — talk soon."; f.reset();
+  });
+</script>

@@ -1,0 +1,357 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { menu, stylists, hours, site } from '../data/site';
+// Set PUBLIC_FORM_ENDPOINT (Web3Forms / Formspree) to receive booking requests by email; otherwise demo mode.
+// For a live salon, this widget can be swapped for a Fresha / Square / Booksy embed.
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
+const config = {
+  menu: menu.map((c) => ({ label: c.label, services: c.services })),
+  stylists: stylists.map(({ id, name, days }) => ({ id, name, days })),
+  hours,
+  currency: site.currency,
+  address: `${site.address.street}, ${site.address.locality}, ${site.address.region} ${site.address.postcode}`,
+  name: site.name,
+};
+const steps = ['Service', 'Stylist', 'Date & time', 'Your details'];
+const fmtDur = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${m % 60}m` : ''}` : `${m}m`);
+---
+<section id="book" class="bg-ink text-on-ink px-5 sm:px-8 lg:px-16 py-20 lg:py-28 scroll-mt-16">
+  <div class="grid lg:grid-cols-12 gap-10 lg:gap-12">
+    <div class="lg:col-span-4 reveal">
+      <p class="eyebrow !text-rose mb-4">Online booking</p>
+      <h2 class="display text-[40px] leading-[1.05] sm:text-5xl lg:text-[56px] text-balance mb-6">Book in under a <em class="italic text-rose">minute</em>.</h2>
+      <p class="text-on-ink-muted leading-relaxed mb-8 max-w-[40ch]">Choose a service, your stylist and a time that suits you. We’ll send a confirmation by email — no payment needed to book.</p>
+
+      <!-- live summary -->
+      <div class="rounded-lg border border-white/10 bg-ink-soft p-6" aria-live="polite">
+        <p class="eyebrow !text-on-ink-muted mb-4">Your appointment</p>
+        <dl class="flex flex-col gap-3 text-sm">
+          <div class="flex justify-between gap-4"><dt class="text-on-ink-muted">Service</dt><dd class="text-right font-semibold" data-sum="service">—</dd></div>
+          <div class="flex justify-between gap-4"><dt class="text-on-ink-muted">Stylist</dt><dd class="text-right font-semibold" data-sum="stylist">—</dd></div>
+          <div class="flex justify-between gap-4"><dt class="text-on-ink-muted">When</dt><dd class="text-right font-semibold" data-sum="when">—</dd></div>
+          <div class="flex justify-between gap-4 pt-3 border-t border-white/10"><dt class="text-on-ink-muted">Estimate</dt><dd class="text-right display-sm text-2xl" data-sum="price">—</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="lg:col-span-8 reveal">
+      <div id="booking" class="rounded-lg bg-background text-foreground p-5 sm:p-8 lg:p-10" data-config={JSON.stringify(config)} data-endpoint={endpoint}>
+        <!-- step indicator -->
+        <ol class="grid grid-cols-4 gap-2 mb-8" aria-label="Booking steps">
+          {steps.map((s, i) => (
+            <li>
+              <button type="button" data-goto={i} disabled={i !== 0}
+                class="w-full text-left group disabled:cursor-default">
+                <span class="block h-1 rounded-full bg-border mb-2.5 overflow-hidden"><span data-bar={i} class="block h-full bg-ink transition-all duration-500" style={i === 0 ? 'width:100%' : 'width:0%'}></span></span>
+                <span class="hidden sm:block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground group-[[data-active]]:text-foreground" data-label={i}>{i + 1}. {s}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+        <p class="sm:hidden text-xs font-semibold uppercase tracking-[0.14em] mb-5" data-mobile-step>Step 1 of 4 · Service</p>
+
+        <form id="booking-form" novalidate>
+          {accessKey && <input type="hidden" name="access_key" value={accessKey} />}
+          <input type="hidden" name="subject" value="New booking request" />
+          <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
+
+          <!-- STEP 1: service -->
+          <fieldset class="min-w-0" data-step="0">
+            <legend class="display-sm text-3xl mb-6">What are we doing?</legend>
+            <div class="max-h-[440px] overflow-y-auto pr-1 -mr-1 flex flex-col gap-6 [scrollbar-width:thin]">
+              {menu.map((c) => (
+                <div>
+                  <p class="eyebrow mb-3">{c.label}</p>
+                  <div class="grid sm:grid-cols-2 gap-2">
+                    {c.services.map((s) => (
+                      <label class="cursor-pointer">
+                        <input type="radio" name="service" value={s.id} class="peer sr-only" />
+                        <span class="flex items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
+                          <span><span class="block text-sm font-semibold">{s.name}</span><span class="meta block text-xs text-muted-foreground mt-0.5">{fmtDur(s.duration)}</span></span>
+                          <span class="text-sm font-semibold whitespace-nowrap">{s.from ? 'from ' : ''}{site.currency}{s.price}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+
+          <!-- STEP 2: stylist -->
+          <fieldset class="min-w-0" data-step="1" hidden>
+            <legend class="display-sm text-3xl mb-6">Who would you like?</legend>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <label class="cursor-pointer">
+                <input type="radio" name="stylist" value="any" class="peer sr-only" />
+                <span class="flex items-center gap-4 rounded-md border border-border bg-surface p-4 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
+                  <span class="w-14 h-14 rounded-full bg-rose-soft text-rose-deep grid place-items-center shrink-0"><Icon name="users" size={22} /></span>
+                  <span><span class="block font-semibold">First available</span><span class="meta block text-xs text-muted-foreground mt-0.5">Most choice of times</span></span>
+                </span>
+              </label>
+              {stylists.map((s) => (
+                <label class="cursor-pointer">
+                  <input type="radio" name="stylist" value={s.id} class="peer sr-only" />
+                  <span class="flex items-center gap-4 rounded-md border border-border bg-surface p-4 transition-colors hover:border-ink/40 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-on-ink peer-focus-visible:outline-2 peer-focus-visible:outline-rose-deep peer-checked:[&_.meta]:text-on-ink-muted">
+                    <Picture src={s.image} alt="" widths={[112]} sizes="56px" formats={['avif', 'webp']} class="w-14 h-14 rounded-full object-cover object-[50%_20%] shrink-0" />
+                    <span><span class="block font-semibold">{s.name}</span><span class="meta block text-xs text-muted-foreground mt-0.5">{s.role}</span></span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <!-- STEP 3: date & time -->
+          <fieldset class="min-w-0" data-step="2" hidden>
+            <legend class="display-sm text-3xl mb-6">When suits you?</legend>
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-sm font-semibold" data-month></p>
+              <div class="flex gap-1">
+                <button type="button" data-scroll="-1" class="w-9 h-9 rounded-full border border-border grid place-items-center hover:border-ink" aria-label="Earlier dates"><Icon name="chevron-left" size={16} /></button>
+                <button type="button" data-scroll="1" class="w-9 h-9 rounded-full border border-border grid place-items-center hover:border-ink" aria-label="Later dates"><Icon name="chevron-right" size={16} /></button>
+              </div>
+            </div>
+            <div data-dates class="flex gap-2 overflow-x-auto pb-2 mb-6 snap-x [scrollbar-width:none]" role="radiogroup" aria-label="Date"></div>
+            <p class="text-sm font-semibold mb-3">Available times</p>
+            <div data-times class="grid grid-cols-3 sm:grid-cols-5 gap-2" role="radiogroup" aria-label="Time"></div>
+            <p data-no-times class="hidden text-sm text-muted-foreground py-6 text-center border border-dashed border-border rounded-md"></p>
+          </fieldset>
+
+          <!-- STEP 4: details -->
+          <fieldset class="min-w-0" data-step="3" hidden>
+            <legend class="display-sm text-3xl mb-6">Almost done.</legend>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <label><span class="block text-sm font-semibold mb-1.5">First name</span><input class="field" name="first_name" autocomplete="given-name" required /></label>
+              <label><span class="block text-sm font-semibold mb-1.5">Last name</span><input class="field" name="last_name" autocomplete="family-name" required /></label>
+              <label><span class="block text-sm font-semibold mb-1.5">Email</span><input class="field" type="email" name="email" autocomplete="email" required /></label>
+              <label><span class="block text-sm font-semibold mb-1.5">Mobile</span><input class="field" type="tel" name="phone" autocomplete="tel" required placeholder="(512) 555-0100" /></label>
+              <label class="sm:col-span-2"><span class="block text-sm font-semibold mb-1.5">Anything we should know? <span class="font-normal text-muted-foreground">(optional)</span></span><textarea class="field resize-none" name="notes" rows="3" placeholder="Inspiration photos, allergies, current colour…"></textarea></label>
+              <label class="sm:col-span-2 flex items-center gap-3 cursor-pointer text-sm">
+                <input type="checkbox" name="new_client" value="yes" class="w-4 h-4 accent-[#171412]" /> I’m a new client (15% off your first colour service)
+              </label>
+            </div>
+          </fieldset>
+
+          <p data-error class="hidden mt-5 text-sm text-rose-deep font-semibold" role="alert"></p>
+
+          <div class="flex items-center justify-between gap-4 mt-8 pt-6 border-t border-border">
+            <button type="button" data-back class="invisible text-sm font-semibold text-foreground/70 hover:text-foreground inline-flex items-center gap-1"><Icon name="chevron-left" size={16} /> Back</button>
+            <button type="button" data-next class="btn-ink disabled:opacity-40 disabled:hover:bg-ink" disabled><span data-next-label>Continue</span> <Icon name="arrow-right" size={16} /></button>
+          </div>
+        </form>
+
+        <!-- DONE -->
+        <div data-done hidden class="text-center py-8">
+          <span class="mx-auto mb-6 w-16 h-16 rounded-full bg-ink text-on-ink grid place-items-center"><Icon name="check" size={28} /></span>
+          <h3 class="display text-4xl mb-3">You’re booked in.</h3>
+          <p data-done-text class="text-muted-foreground max-w-[44ch] mx-auto mb-8"></p>
+          <div class="flex flex-wrap justify-center gap-3">
+            <button type="button" data-ics class="btn-ink"><Icon name="calendar-plus" size={16} /> Add to calendar</button>
+            <button type="button" data-restart class="btn-ghost">Book another</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  type Service = { id: string; name: string; duration: number; price: number; from?: boolean };
+  type Cfg = {
+    menu: { label: string; services: Service[] }[];
+    stylists: { id: string; name: string; days: number[] }[];
+    hours: Record<string, { open: string; close: string } | null>;
+    currency: string; address: string; name: string;
+  };
+  const root = document.getElementById('booking')!;
+  const cfg = JSON.parse(root.dataset.config!) as Cfg;
+  const form = root.querySelector<HTMLFormElement>('#booking-form')!;
+  const services = cfg.menu.flatMap((c) => c.services);
+  const steps = [...root.querySelectorAll<HTMLFieldSetElement>('[data-step]')];
+  const nextBtn = root.querySelector<HTMLButtonElement>('[data-next]')!;
+  const backBtn = root.querySelector<HTMLButtonElement>('[data-back]')!;
+  const errEl = root.querySelector<HTMLElement>('[data-error]')!;
+  const labels = ['Service', 'Stylist', 'Date & time', 'Your details'];
+
+  const st = { step: 0, service: '', stylist: '', date: '', time: '', assigned: '' };
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const iso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const fmtTime = (m: number) => { const d = new Date(2000, 0, 1, Math.floor(m / 60), m % 60); return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); };
+  const svc = () => services.find((s) => s.id === st.service);
+  const stylistName = (id: string) => cfg.stylists.find((s) => s.id === id)?.name ?? '';
+
+  // Deterministic "already booked" slots so the demo looks realistic and stable between visits.
+  const hash = (s: string) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) % 100; };
+  const freeStylists = (dateIso: string, dow: number, t: number) =>
+    cfg.stylists.filter((s) => s.days.includes(dow) && (st.stylist === 'any' || st.stylist === s.id) && hash(`${dateIso}|${s.id}|${t}`) >= 38);
+
+  const slotsFor = (d: Date) => {
+    const h = cfg.hours[d.getDay()]; const s = svc();
+    if (!h || !s) return [];
+    const out: { t: number; who: string }[] = [];
+    const now = new Date(); const isToday = iso(d) === iso(now);
+    const earliest = isToday ? now.getHours() * 60 + now.getMinutes() + 60 : 0;
+    for (let t = toMin(h.open); t + s.duration <= toMin(h.close); t += 30) {
+      if (t < earliest) continue;
+      const free = freeStylists(iso(d), d.getDay(), t);
+      if (free.length) out.push({ t, who: free[0].id });
+    }
+    return out;
+  };
+
+  // --- date strip
+  const datesEl = root.querySelector<HTMLElement>('[data-dates]')!;
+  const timesEl = root.querySelector<HTMLElement>('[data-times]')!;
+  const noTimes = root.querySelector<HTMLElement>('[data-no-times]')!;
+  const days: Date[] = [...Array(21)].map((_, i) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + i); return d; });
+
+  const renderDates = () => {
+    datesEl.innerHTML = '';
+    let firstOpen = '';
+    days.forEach((d) => {
+      const available = slotsFor(d).length > 0;
+      if (available && !firstOpen) firstOpen = iso(d);
+      const b = document.createElement('button');
+      b.type = 'button'; b.dataset.date = iso(d); b.disabled = !available;
+      b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(st.date === iso(d)));
+      b.className = 'snap-start shrink-0 w-[68px] rounded-md border py-3 text-center transition-colors border-border bg-surface hover:border-ink/40 disabled:opacity-35 disabled:hover:border-border disabled:cursor-not-allowed aria-checked:bg-ink aria-checked:text-on-ink aria-checked:border-ink';
+      b.innerHTML = `<span class="block text-[11px] font-semibold uppercase tracking-wider opacity-70">${d.toLocaleDateString('en-US', { weekday: 'short' })}</span><span class="block display-sm text-2xl leading-tight">${d.getDate()}</span><span class="block text-[10px] opacity-60">${available ? d.toLocaleDateString('en-US', { month: 'short' }) : (cfg.hours[d.getDay()] ? 'Full' : 'Closed')}</span>`;
+      b.addEventListener('click', () => { st.date = iso(d); st.time = ''; renderDates(); renderTimes(); update(); });
+      datesEl.appendChild(b);
+    });
+    if (!st.date && firstOpen) { st.date = firstOpen; renderDates(); return; }
+    const cur = days.find((d) => iso(d) === st.date) ?? days[0];
+    root.querySelector('[data-month]')!.textContent = cur.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  const renderTimes = () => {
+    timesEl.innerHTML = '';
+    const d = days.find((x) => iso(x) === st.date);
+    const slots = d ? slotsFor(d) : [];
+    noTimes.classList.toggle('hidden', slots.length > 0);
+    noTimes.textContent = 'No times left on this day — try another date.';
+    slots.forEach(({ t, who }) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = fmtTime(t);
+      b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(st.time === String(t)));
+      b.className = 'rounded-md border border-border bg-surface py-2.5 text-sm font-semibold transition-colors hover:border-ink/40 aria-checked:bg-ink aria-checked:text-on-ink aria-checked:border-ink';
+      b.addEventListener('click', () => { st.time = String(t); st.assigned = who; renderTimes(); update(); });
+      timesEl.appendChild(b);
+    });
+  };
+  root.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach((b) =>
+    b.addEventListener('click', () => datesEl.scrollBy({ left: Number(b.dataset.scroll) * 300, behavior: 'smooth' })));
+
+  // --- summary + navigation
+  const whenText = () => {
+    if (!st.date || !st.time) return '—';
+    const d = new Date(st.date + 'T12:00');
+    return `${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}, ${fmtTime(Number(st.time))}`;
+  };
+  const stepValid = (i: number) => {
+    if (i === 0) return !!st.service;
+    if (i === 1) return !!st.stylist;
+    if (i === 2) return !!st.date && !!st.time;
+    return true;
+  };
+  const update = () => {
+    const s = svc();
+    const set = (k: string, v: string) => { root.closest('section')!.querySelector(`[data-sum="${k}"]`)!.textContent = v; };
+    set('service', s ? s.name : '—');
+    set('stylist', st.stylist ? (st.stylist === 'any' ? (st.time ? `${stylistName(st.assigned)} (first available)` : 'First available') : stylistName(st.stylist)) : '—');
+    set('when', whenText());
+    set('price', s ? `${s.from ? 'from ' : ''}${cfg.currency}${s.price}` : '—');
+    nextBtn.disabled = !stepValid(st.step);
+  };
+  const show = (i: number) => {
+    st.step = i;
+    steps.forEach((f, j) => (f.hidden = j !== i));
+    root.querySelectorAll<HTMLElement>('[data-bar]').forEach((b) => (b.style.width = Number(b.dataset.bar) <= i ? '100%' : '0%'));
+    root.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((b) => {
+      const j = Number(b.dataset.goto);
+      b.disabled = j > i; b.toggleAttribute('data-active', j <= i);
+    });
+    root.querySelector('[data-mobile-step]')!.textContent = `Step ${i + 1} of 4 · ${labels[i]}`;
+    backBtn.classList.toggle('invisible', i === 0);
+    root.querySelector('[data-next-label]')!.textContent = i === 3 ? 'Confirm booking' : 'Continue';
+    errEl.classList.add('hidden');
+    if (i === 2) { renderDates(); renderTimes(); }
+    update();
+  };
+  root.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((b) => b.addEventListener('click', () => show(Number(b.dataset.goto))));
+  backBtn.addEventListener('click', () => show(Math.max(0, st.step - 1)));
+
+  form.addEventListener('change', (e) => {
+    const t = e.target as HTMLInputElement;
+    if (t.name === 'service') { st.service = t.value; st.time = ''; st.date = ''; }
+    if (t.name === 'stylist') { st.stylist = t.value; st.time = ''; st.date = ''; }
+    update();
+  });
+
+  const submit = async () => {
+    const required = [...steps[3].querySelectorAll<HTMLInputElement>('input[required]')];
+    const bad = required.find((i) => !i.checkValidity() || (i.name === 'phone' && i.value.replace(/\D/g, '').length < 7));
+    if (bad) {
+      bad.focus();
+      errEl.textContent = bad.name === 'email' ? 'Please enter a valid email address.' : bad.name === 'phone' ? 'Please enter a valid phone number.' : 'Please add your first and last name.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    nextBtn.disabled = true; root.querySelector('[data-next-label]')!.textContent = 'Booking…';
+    const data = new FormData(form);
+    const s = svc()!;
+    const who = st.stylist === 'any' ? st.assigned : st.stylist;
+    data.set('service_name', s.name); data.set('stylist_name', stylistName(who)); data.set('when', whenText());
+    try {
+      const endpoint = root.dataset.endpoint;
+      if (endpoint) {
+        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+      } else {
+        await new Promise((r) => setTimeout(r, 800)); // demo mode
+      }
+      root.querySelector('[data-done-text]')!.textContent =
+        `${data.get('first_name')}, your ${s.name.toLowerCase()} with ${stylistName(who).split(' ')[0]} is requested for ${whenText()}. A confirmation is on its way to ${data.get('email')}.`;
+      form.hidden = true; root.querySelector('ol')!.hidden = true; root.querySelector<HTMLElement>('[data-mobile-step]')!.hidden = true;
+      root.querySelector<HTMLElement>('[data-done]')!.hidden = false;
+    } catch {
+      errEl.textContent = 'Sorry — something went wrong. Please call us or try again.';
+      errEl.classList.remove('hidden');
+      nextBtn.disabled = false; root.querySelector('[data-next-label]')!.textContent = 'Confirm booking';
+    }
+  };
+  nextBtn.addEventListener('click', () => (st.step < 3 ? show(st.step + 1) : submit()));
+
+  // "Add to calendar" (.ics download)
+  root.querySelector('[data-ics]')!.addEventListener('click', () => {
+    const s = svc()!; const [y, m, d] = st.date.split('-').map(Number);
+    const start = new Date(y, m - 1, d, 0, Number(st.time)); const end = new Date(start.getTime() + s.duration * 60000);
+    const f = (x: Date) => `${x.getFullYear()}${pad(x.getMonth() + 1)}${pad(x.getDate())}T${pad(x.getHours())}${pad(x.getMinutes())}00`;
+    const who = stylistName(st.stylist === 'any' ? st.assigned : st.stylist);
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Sable & Rose//Booking//EN', 'BEGIN:VEVENT',
+      `UID:${Date.now()}@sableandrose.studio`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      `DTSTART:${f(start)}`, `DTEND:${f(end)}`, `SUMMARY:${s.name} with ${who} — ${cfg.name}`, `LOCATION:${cfg.address.replace(/,/g, '\\,')}`,
+      'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })); a.download = 'sable-and-rose-appointment.ics'; a.click();
+  });
+  root.querySelector('[data-restart]')!.addEventListener('click', () => {
+    form.reset(); Object.assign(st, { service: '', stylist: '', date: '', time: '', assigned: '' });
+    form.hidden = false; root.querySelector('ol')!.hidden = false; root.querySelector<HTMLElement>('[data-mobile-step]')!.hidden = false;
+    root.querySelector<HTMLElement>('[data-done]')!.hidden = true; show(0);
+  });
+
+  // Presets from "Book" links elsewhere on the page
+  document.addEventListener('book:preset', (e) => {
+    const { service, stylist } = (e as CustomEvent).detail as { service?: string; stylist?: string };
+    if (service) { st.service = service; form.querySelector<HTMLInputElement>(`input[name=service][value="${service}"]`)!.checked = true; }
+    if (stylist) { st.stylist = stylist; form.querySelector<HTMLInputElement>(`input[name=stylist][value="${stylist}"]`)!.checked = true; }
+    st.date = ''; st.time = '';
+    show(st.service ? (st.stylist ? 2 : 1) : 0);
+  });
+
+  show(0);
+</script>

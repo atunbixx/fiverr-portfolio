@@ -1,0 +1,13 @@
+---
+import { Star, ArrowRight, ArrowUpRight, Clock, MapPin, Phone, Mail, Menu, X, Check, ChevronLeft, ChevronRight, CalendarPlus, Sparkles, Gift, Leaf, Droplets, Scissors, Users } from '@lucide/astro';
+const icons = {
+  star: Star, 'arrow-right': ArrowRight, 'arrow-up-right': ArrowUpRight, clock: Clock, 'map-pin': MapPin, phone: Phone, mail: Mail,
+  menu: Menu, x: X, check: Check, 'chevron-left': ChevronLeft, 'chevron-right': ChevronRight, 'calendar-plus': CalendarPlus,
+  sparkles: Sparkles, gift: Gift, leaf: Leaf, droplets: Droplets, scissors: Scissors, users: Users,
+} as const;
+export type IconName = keyof typeof icons;
+interface Props { name: IconName; size?: number; class?: string; strokeWidth?: number }
+const { name, size = 18, class: className, strokeWidth = 1.75 } = Astro.props;
+const Cmp = icons[name];
+---
+<Cmp size={size} class={className} stroke-width={strokeWidth} aria-hidden="true" />
