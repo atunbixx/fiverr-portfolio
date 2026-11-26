@@ -1,0 +1,363 @@
+---
+import '../styles/global.css';
+import { Picture, getImage } from 'astro:assets';
+import { site, nav, work, heroSlides, clients, about, budgets } from '../data/site';
+
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+const accessKey = import.meta.env.PUBLIC_FORM_ACCESS_KEY ?? '';
+const og = await getImage({ src: heroSlides[0].image, width: 1200, height: 630, format: 'jpg', fit: 'cover' });
+const canonical = new URL('/', Astro.site);
+const ogUrl = new URL(og.src, Astro.site);
+const pad = (n: number) => String(n).padStart(2, '0');
+// Large versions for the lightbox
+const lightbox = await Promise.all(work.map(async (w) => (await getImage({ src: w.image, width: 1600, format: 'webp' })).src));
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: 'Fashion & Editorial Photographer',
+  description: site.description,
+  url: canonical.href,
+  image: ogUrl.href,
+  email: site.email,
+  address: { '@type': 'PostalAddress', addressLocality: 'New York', addressRegion: 'NY', addressCountry: 'US' },
+  sameAs: [site.instagramUrl],
+};
+---
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{site.title}</title>
+  <meta name="description" content={site.description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content={site.title} />
+  <meta property="og:description" content={site.description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- HEADER -->
+<header id="header">
+  <a id="logo" href="#top">{site.name}</a>
+  <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+  <nav id="nav" aria-label="Main">
+    {nav.map((l, i) => (
+      <>
+        {i > 0 && <span class="nav-dot" aria-hidden="true">·</span>}
+        <a class="nav-link" href={l.href}>{l.label}</a>
+      </>
+    ))}
+    <div id="clock" data-tz={site.timezone} aria-label="Local time in New York">{site.city} &nbsp;<span>--:--</span></div>
+  </nav>
+</header>
+
+<main id="main">
+<!-- HERO -->
+<section id="top" aria-roledescription="carousel" aria-label="Featured work">
+  <div id="hero">
+    {heroSlides.map((s, i) => (
+      <div class:list={['hero-slide', { 'is-active': i === 0 }]} aria-hidden={i === 0 ? 'false' : 'true'}
+        data-label={s.label} data-title={s.title}>
+        <Picture src={s.image} alt={s.alt} widths={[768, 1280, 1536]} sizes="100vw" formats={['avif', 'webp']}
+          loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} style={`object-position:${s.position}`} />
+      </div>
+    ))}
+    <div id="hero-caption" aria-live="polite">
+      <div id="hero-caption-label">{heroSlides[0].label}</div>
+      <div id="hero-caption-title">{heroSlides[0].title}</div>
+    </div>
+    <div id="hero-counter"><span data-current>01</span> / {pad(heroSlides.length)}</div>
+    <div id="hero-arrows">
+      <button class="hero-arrow" type="button" data-dir="-1" aria-label="Previous image">←</button>
+      <button class="hero-arrow" type="button" data-dir="1" aria-label="Next image">→</button>
+    </div>
+    <div id="hero-progress"></div>
+  </div>
+</section>
+
+<!-- SELECTED WORK -->
+<section id="selected-work">
+  <h2 class="section-label">Selected Work</h2>
+  <div class="work-grid">
+    {work.map((w, i) => (
+      <button type="button" class:list={['work-item', `work-item-${i + 1}`, w.layout, 'reveal']} data-index={i} aria-label={`Open ${w.project} for ${w.client}, ${w.year}`}>
+        <div class="work-media">
+          <Picture src={w.image} alt={w.alt} widths={[480, 800, 1100]} sizes={w.layout === 'tall' ? '(min-width: 900px) 33vw, 100vw' : '(min-width: 900px) 33vw, 100vw'} formats={['avif', 'webp']} loading={i === 0 ? 'eager' : 'lazy'} />
+        </div>
+        <div class="work-caption">
+          <span class="work-caption-project">{w.project}</span>
+          <span class="work-caption-sep">—</span>
+          <span class="work-caption-client">{w.client}</span>
+          <span class="work-caption-year">{w.year}</span>
+        </div>
+      </button>
+    ))}
+  </div>
+</section>
+
+<!-- STATEMENT -->
+<section id="statement">
+  <p id="statement-text" class="reveal">
+    Fashion, <em>portraiture</em> and campaign photography<br />for people who care about the frame.
+  </p>
+</section>
+
+<!-- SELECTED CLIENTS -->
+<section id="clients">
+  <h2 class="section-label">Selected Clients</h2>
+  <div class="clients-grid reveal">
+    {clients.map((col) => (
+      <ul class="clients-col">
+        {col.map((c) => (
+          <li class="client-row"><span class="client-name">{c.name}</span><span class="client-type">{c.type}</span></li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="reveal">
+    <Picture id="about-img" src={about.image} alt={about.alt} widths={[512]} sizes="(min-width: 900px) 45vw, 100vw" formats={['avif', 'webp']} />
+  </div>
+  <div id="about-content" class="reveal">
+    <div>
+      <h2 id="about-name-label">About the Photographer</h2>
+      <p id="about-bio">
+        Inès Marlowe is a New York–based photographer specialising in high-fashion editorial and campaign work. With a background in fine art and a decade of experience shooting for leading titles, her images are defined by a <em>quiet intensity</em> — an obsession with light, composition and the unguarded moment.<br /><br />
+        She has worked across Paris, Milan, Tokyo and New York, collaborating with designers, stylists and art directors who share her belief that great photography starts with great restraint.
+      </p>
+    </div>
+    <div id="about-rep">
+      <div id="about-rep-label">Represented by</div>
+      <div id="about-rep-name">{site.agency}</div>
+    </div>
+    <div id="about-services">
+      {about.services.map((s) => (
+        <a class="service-row" href="#contact" data-project={s}>
+          <span class="service-name">{s}</span>
+          <span class="service-arrow" aria-hidden="true">→</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <h2 id="contact-heading" class="reveal">Let's make<br /><em>something</em>.</h2>
+  <div class="contact-layout">
+    <div class="contact-info">
+      <div class="contact-info-block">
+        <div class="contact-info-label">Email</div>
+        <div class="contact-info-value"><a href={`mailto:${site.email}`}>{site.email}</a></div>
+      </div>
+      <div class="contact-info-block">
+        <div class="contact-info-label">Agent</div>
+        <div class="contact-info-value"><a href={`mailto:${site.agentEmail}`}>{site.agentEmail}</a><br /><a href={`tel:${site.agentPhone.replace(/\s/g, '')}`}>{site.agentPhone}</a></div>
+      </div>
+      <div class="contact-info-block">
+        <div class="contact-info-label">Instagram</div>
+        <div class="contact-info-value"><a href={site.instagramUrl} target="_blank" rel="noopener">{site.instagram}</a></div>
+      </div>
+      <div class="contact-info-block">
+        <div class="contact-info-label">Based in</div>
+        <div class="contact-info-value">New York, NY</div>
+      </div>
+    </div>
+
+    <div>
+      <form id="inquiry" class="contact-form" novalidate data-endpoint={endpoint}>
+        {accessKey && <input type="hidden" name="access_key" value={accessKey} />}
+        <input type="hidden" name="subject" value="New project inquiry" />
+        <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" />
+        <div class="form-row">
+          <label class="form-field"><span class="form-label">Name</span><input class="form-input" name="name" placeholder="Your name" autocomplete="name" required /></label>
+          <label class="form-field"><span class="form-label">Email</span><input class="form-input" type="email" name="email" placeholder="your@email.com" autocomplete="email" required /></label>
+        </div>
+        <div class="form-row">
+          <label class="form-field"><span class="form-label">Project Type</span>
+            <select class="form-select" name="project_type" id="project-type" required>
+              <option value="" disabled selected>Select type</option>
+              {about.services.map((s) => <option>{s}</option>)}
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="form-field"><span class="form-label">Budget Range</span>
+            <select class="form-select" name="budget" required>
+              <option value="" disabled selected>Select range</option>
+              {budgets.map((b) => <option>{b}</option>)}
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label class="form-field full"><span class="form-label">Shoot Dates</span><input class="form-input" name="dates" placeholder="Preferred dates or timeframe" /></label>
+        </div>
+        <div class="form-row">
+          <label class="form-field full"><span class="form-label">Message</span><textarea class="form-textarea" name="message" rows="3" placeholder="Tell me about your project — the brief, the feeling, the story you want to tell." required></textarea></label>
+        </div>
+        <p class="form-error" role="alert" aria-live="polite"></p>
+        <button class="form-submit" type="submit"><span data-label>Send Inquiry</span> &nbsp;→</button>
+      </form>
+      <div class="form-done" aria-live="polite">
+        <p class="form-done-title">Thank you.</p>
+        <p class="form-done-text"></p>
+        <button type="button" class="lb-btn" style="color:#000;align-self:flex-start;font-size:11px" data-again>Send another inquiry</button>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-copy">© {new Date().getFullYear()} {site.name} &nbsp;·&nbsp; {site.city}</div>
+  <a class="footer-back" href="#top">↑ &nbsp;Back to top</a>
+</footer>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" data-images={JSON.stringify(lightbox)}
+  data-captions={JSON.stringify(work.map((w) => ({ project: w.project, client: w.client, year: w.year, alt: w.alt })))}>
+  <div class="lb-top"><span id="lb-count"></span><button class="lb-btn" type="button" data-close>Close ✕</button></div>
+  <div class="lb-stage"><img id="lb-img" alt="" /></div>
+  <div class="lb-bottom">
+    <button class="lb-btn" type="button" data-step="-1">← Prev</button>
+    <span id="lb-caption"></span>
+    <button class="lb-btn" type="button" data-step="1">Next →</button>
+  </div>
+</div>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // --- Live New York clock
+  const clock = document.querySelector<HTMLElement>('#clock span')!;
+  const tz = document.getElementById('clock')!.dataset.tz!;
+  const tick = () => { clock.textContent = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz }).format(new Date()); };
+  tick(); setInterval(tick, 15000);
+
+  // --- Mobile menu
+  const toggle = document.getElementById('menu-toggle')!;
+  const navEl = document.getElementById('nav')!;
+  toggle.addEventListener('click', () => {
+    const open = navEl.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(open)); toggle.textContent = open ? 'Close' : 'Menu';
+  });
+  navEl.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => { navEl.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); toggle.textContent = 'Menu'; }));
+
+  // --- Hero slideshow
+  const slides = [...document.querySelectorAll<HTMLElement>('.hero-slide')];
+  const label = document.getElementById('hero-caption-label')!;
+  const title = document.getElementById('hero-caption-title')!;
+  const current = document.querySelector('#hero-counter [data-current]')!;
+  const progress = document.getElementById('hero-progress')!;
+  const DURATION = 6000;
+  let idx = 0, timer = 0, hovering = false;
+  const go = (n: number) => {
+    slides[idx].classList.remove('is-active'); slides[idx].setAttribute('aria-hidden', 'true');
+    idx = (n + slides.length) % slides.length;
+    slides[idx].classList.add('is-active'); slides[idx].setAttribute('aria-hidden', 'false');
+    label.textContent = slides[idx].dataset.label!; title.textContent = slides[idx].dataset.title!;
+    current.textContent = String(idx + 1).padStart(2, '0');
+    restart();
+  };
+  const restart = () => {
+    clearTimeout(timer);
+    progress.style.transition = 'none'; progress.style.width = '0';
+    if (reduce || hovering) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => { progress.style.transition = `width ${DURATION}ms linear`; progress.style.width = '100%'; }));
+    timer = window.setTimeout(() => go(idx + 1), DURATION);
+  };
+  document.querySelectorAll<HTMLButtonElement>('.hero-arrow').forEach((b) => b.addEventListener('click', () => go(idx + Number(b.dataset.dir))));
+  const heroEl = document.getElementById('hero')!;
+  heroEl.addEventListener('mouseenter', () => { hovering = true; restart(); });
+  heroEl.addEventListener('mouseleave', () => { hovering = false; restart(); });
+  restart();
+
+  // --- Lightbox
+  const lb = document.getElementById('lightbox')!;
+  const imgs = JSON.parse(lb.dataset.images!) as string[];
+  const caps = JSON.parse(lb.dataset.captions!) as { project: string; client: string; year: number; alt: string }[];
+  const lbImg = document.getElementById('lb-img') as HTMLImageElement;
+  let li = 0, lastFocus: HTMLElement | null = null;
+  const show = (n: number) => {
+    li = (n + imgs.length) % imgs.length;
+    lbImg.src = imgs[li]; lbImg.alt = caps[li].alt;
+    document.getElementById('lb-count')!.textContent = `${String(li + 1).padStart(2, '0')} / ${String(imgs.length).padStart(2, '0')}`;
+    document.getElementById('lb-caption')!.innerHTML = `${caps[li].project} <span class="muted">— ${caps[li].client}, ${caps[li].year}</span>`;
+  };
+  const open = (n: number) => { lastFocus = document.activeElement as HTMLElement; show(n); lb.classList.add('is-open'); document.body.style.overflow = 'hidden'; lb.querySelector<HTMLButtonElement>('[data-close]')!.focus(); };
+  const close = () => { lb.classList.remove('is-open'); document.body.style.overflow = ''; lastFocus?.focus(); };
+  document.querySelectorAll<HTMLButtonElement>('.work-item').forEach((b) => b.addEventListener('click', () => open(Number(b.dataset.index))));
+  lb.querySelector('[data-close]')!.addEventListener('click', close);
+  lb.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) => b.addEventListener('click', () => show(li + Number(b.dataset.step))));
+  lb.addEventListener('click', (e) => { if (e.target === lb.querySelector('.lb-stage')) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (lb.classList.contains('is-open')) {
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') show(li + 1);
+      if (e.key === 'ArrowLeft') show(li - 1);
+    } else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && heroEl.getBoundingClientRect().bottom > 0 && !(e.target as HTMLElement).closest('input,textarea,select')) {
+      go(idx + (e.key === 'ArrowRight' ? 1 : -1));
+    }
+  });
+
+  // --- Service rows pre-select the project type
+  const projectType = document.getElementById('project-type') as HTMLSelectElement;
+  document.querySelectorAll<HTMLAnchorElement>('.service-row').forEach((a) => a.addEventListener('click', () => { projectType.value = a.dataset.project!; }));
+
+  // --- Inquiry form
+  const form = document.getElementById('inquiry') as HTMLFormElement;
+  const err = form.querySelector<HTMLElement>('.form-error')!;
+  const done = document.querySelector<HTMLElement>('.form-done')!;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    form.querySelectorAll('.field-invalid').forEach((f) => f.classList.remove('field-invalid'));
+    const bad = [...form.querySelectorAll<HTMLInputElement>('[required]')].filter((f) => !f.checkValidity());
+    if (bad.length) {
+      bad.forEach((f) => f.closest('.form-field')?.classList.add('field-invalid'));
+      bad[0].focus();
+      err.textContent = bad[0].name === 'email' && bad[0].value ? 'Please enter a valid email address.' : 'Please complete the highlighted fields.';
+      return;
+    }
+    err.textContent = '';
+    const btn = form.querySelector<HTMLButtonElement>('.form-submit')!;
+    btn.disabled = true; btn.querySelector('[data-label]')!.textContent = 'Sending';
+    const data = new FormData(form);
+    try {
+      const endpoint = form.dataset.endpoint;
+      if (endpoint) {
+        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+      } else {
+        await new Promise((r) => setTimeout(r, 700)); // demo mode
+      }
+      done.querySelector('.form-done-text')!.textContent =
+        `Your ${String(data.get('project_type')).toLowerCase()} inquiry is with the studio. You'll hear back from Inès or North & Nine at ${data.get('email')} within two working days.`;
+      form.style.display = 'none'; done.classList.add('is-visible');
+    } catch {
+      err.textContent = 'Something went wrong — please email the studio directly.';
+    } finally {
+      btn.disabled = false; btn.querySelector('[data-label]')!.textContent = 'Send Inquiry';
+    }
+  });
+  done.querySelector('[data-again]')!.addEventListener('click', () => { form.reset(); form.style.display = ''; done.classList.remove('is-visible'); });
+
+  // --- Reveal on scroll
+  const io = new IntersectionObserver((entries) => entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+</script>
+</body>
+</html>

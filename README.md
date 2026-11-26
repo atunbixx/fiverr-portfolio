@@ -6,6 +6,7 @@ Each folder is a standalone [Astro](https://astro.build) + Tailwind CSS site.
 | Site | Industry | Highlights |
 |---|---|---|
 | [`maison-eclat/`](./maison-eclat) | Restaurant / bistro | Editorial design, working reservation form with live time slots, menu, hours, map, schema.org restaurant data |
+| [`ines-marlowe/`](./ines-marlowe) | Fashion photographer | Banani-designed black-and-white agency portfolio, hero slideshow, lightbox, live NY clock, inquiry form |
 | _coming soon_ | Home services | Quote form, before/after gallery, reviews |
 | _coming soon_ | Beauty & wellness | Booking-driven, premium minimal |
 
